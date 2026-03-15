@@ -122,20 +122,26 @@ export default function PrayersPage() {
           <h1 className="text-2xl font-display font-bold text-foreground">Daily Prayers</h1>
           <p className="text-muted-foreground text-sm mt-1">Manage the group's daily prayer messages</p>
         </div>
-        <Button onClick={openAdd} className="gap-2">
-          <Plus className="w-4 h-4" /> Add Prayer
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={generateTodaysPrayer} disabled={generating} className="gap-2">
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {generating ? 'Generating...' : 'Auto-Generate (KkkT)'}
+          </Button>
+          <Button onClick={openAdd} className="gap-2">
+            <Plus className="w-4 h-4" /> Add Prayer
+          </Button>
+        </div>
       </div>
 
       {/* Today's prayer highlight */}
       {todayPrayer && (
-        <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg, hsl(221 83% 53%), hsl(158 64% 45%))' }}>
+        <div className="rounded-2xl p-6 bg-gradient-to-br from-primary to-secondary">
           <div className="flex items-center gap-2 mb-3">
             <Star className="w-4 h-4 text-yellow-300 fill-yellow-300" />
-            <span className="text-white/80 text-xs font-semibold uppercase tracking-wide">Today's Active Prayer</span>
+            <span className="text-primary-foreground/80 text-xs font-semibold uppercase tracking-wide">Today's Active Prayer · KkkT Calendar</span>
           </div>
-          <h2 className="text-white font-display font-bold text-xl mb-3">{todayPrayer.title}</h2>
-          <p className="text-white/85 leading-relaxed">{todayPrayer.content}</p>
+          <h2 className="text-primary-foreground font-display font-bold text-xl mb-3">{todayPrayer.title}</h2>
+          <p className="text-primary-foreground/85 leading-relaxed whitespace-pre-line">{todayPrayer.content}</p>
         </div>
       )}
 
