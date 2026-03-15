@@ -3,16 +3,17 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Users, CreditCard, FileText, BookOpen,
-  Upload, LogOut, Menu, X, Cross
+  Upload, LogOut, Menu, X, Cross, Crown, Smartphone
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Members', href: '/members', icon: Users },
   { label: 'Transactions', href: '/transactions', icon: CreditCard },
+  { label: 'Leaders', href: '/leaders', icon: Crown },
   { label: 'SMS Import', href: '/sms-import', icon: Upload },
+  { label: 'Auto SMS', href: '/sms-webhook', icon: Smartphone },
   { label: 'Reports', href: '/reports', icon: FileText },
   { label: 'Daily Prayer', href: '/prayers', icon: BookOpen },
 ];
