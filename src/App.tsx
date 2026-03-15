@@ -12,6 +12,8 @@ import DashboardPage from "./pages/Dashboard";
 import MembersPage from "./pages/Members";
 import TransactionsPage from "./pages/Transactions";
 import SmsImportPage from "./pages/SmsImport";
+import SmsWebhookPage from "./pages/SmsWebhook";
+import LeadersPage from "./pages/Leaders";
 import ReportsPage from "./pages/Reports";
 import PrayersPage from "./pages/Prayers";
 import NotFound from "./pages/NotFound";
