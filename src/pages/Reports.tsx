@@ -191,7 +191,7 @@ export default function ReportsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-secondary font-bold">KES {m.total.toLocaleString()}</span>
+                  <span className="text-secondary font-bold">TSh {m.total.toLocaleString()}</span>
                   <TrendingUp className="w-4 h-4 text-muted-foreground group-open:rotate-180 transition-transform" />
                 </div>
               </summary>
