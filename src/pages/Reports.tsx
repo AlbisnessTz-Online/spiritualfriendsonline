@@ -164,7 +164,7 @@ export default function ReportsPage() {
                   <tr key={row.month} className="hover:bg-muted/30">
                     <td className="px-5 py-3 font-medium text-foreground">{row.month} {year}</td>
                     <td className="px-5 py-3 text-muted-foreground">{row.count}</td>
-                    <td className="px-5 py-3 text-secondary font-semibold">{row.total.toLocaleString('en-KE', { minimumFractionDigits: 2 })}</td>
+                    <td className="px-5 py-3 text-secondary font-semibold">{row.total.toLocaleString('sw-TZ', { minimumFractionDigits: 2 })}</td>
                   </tr>
                 ))}
               </tbody>
