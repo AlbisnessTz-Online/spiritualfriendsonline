@@ -15,18 +15,19 @@ interface ParsedTransaction {
   error?: string;
 }
 
-// Regex to parse typical M-Pesa SMS messages
-// e.g.: "QAZ1234567 Confirmed. KES500 sent to JOHN DOE 0712345678 on 1/3/25 at 10:00 AM"
-// or: "QAZ1234567 Confirmed.You have received KES 500 from JOHN DOE 0712345678 on 1/3/25 at 10:00 AM"
+// Regex to parse typical M-Pesa Tanzania SMS messages (M-KOBA)
+// e.g.: "QAZ1234567 Confirmed. TSh500 sent to JOHN DOE 0712345678..."
+// Tanzania M-Pesa uses 07xx and 06xx numbers
 function parseMpesaSms(text: string): Omit<ParsedTransaction, 'raw' | 'valid' | 'error'> | null {
   // Transaction ID
-  const txIdMatch = text.match(/([A-Z]{2,3}\d{7,10})/);
-  // Amount
-  const amountMatch = text.match(/KES\s*([0-9,]+(?:\.\d{2})?)/i);
-  // Phone number
-  const phoneMatch = text.match(/(07\d{8}|2547\d{8}|\+2547\d{8})/);
+  const txIdMatch = text.match(/\b([A-Z]{2,4}\d{7,10})\b/);
+  // Amount - Tanzania uses TSh or KES or just numbers after Confirmed
+  const amountMatch = text.match(/(?:TSh|KES|Tsh)\s*([\d,]+(?:\.\d{2})?)/i) 
+    || text.match(/(?:received|sent|paid)\s+(?:TSh|KES|Tsh)?\s*([\d,]+(?:\.\d{2})?)/i);
+  // Tanzania phone numbers: 07xx, 06xx, 2557xx, +2557xx
+  const phoneMatch = text.match(/(07\d{8}|06\d{8}|2557\d{8}|\+2557\d{8})/);
   // Name – between "from " or "to " and a phone number
-  const nameMatch = text.match(/(?:from|to)\s+([A-Z\s]+)\s+(?:07\d{8}|2547\d{8})/i);
+  const nameMatch = text.match(/(?:from|to|kutoka kwa|kwenda kwa)\s+([A-Z\s]+)\s+(?:07\d{8}|06\d{8}|2557\d{8})/i);
   // Date
   const dateMatch = text.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);
 
