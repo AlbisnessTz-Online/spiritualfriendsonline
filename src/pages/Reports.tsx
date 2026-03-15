@@ -100,7 +100,7 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Reports</h1>
-          <p className="text-muted-foreground text-sm mt-1">Year: {year} · Grand total: <span className="font-semibold text-secondary">KES {grandTotal.toLocaleString()}</span></p>
+          <p className="text-muted-foreground text-sm mt-1">Year: {year} · Grand total: <span className="font-semibold text-secondary">TSh {grandTotal.toLocaleString()}</span></p>
         </div>
         <div className="flex items-center gap-3">
           <div className="space-y-1">
