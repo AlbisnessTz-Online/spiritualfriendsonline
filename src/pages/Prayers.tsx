@@ -36,7 +36,34 @@ export default function PrayersPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingPrayer, setEditingPrayer] = useState<Prayer | null>(null);
-  const [form, setForm] = useState(emptyForm);
+  const [generating, setGenerating] = useState(false);
+
+  const generateTodaysPrayer = async () => {
+    setGenerating(true);
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const res = await fetch(`${supabaseUrl}/functions/v1/auto-daily-prayer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${anonKey}` },
+        body: JSON.stringify({ source: 'manual' }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast({ title: '✨ Prayer generated!', description: data.title });
+        fetchPrayers();
+      } else if (data.message?.includes('already exists')) {
+        toast({ title: 'Prayer already set for today', description: 'Edit it below if needed.' });
+      } else {
+        toast({ title: 'Generation failed', description: data.error || 'Try again', variant: 'destructive' });
+      }
+    } catch (e) {
+      toast({ title: 'Error', description: String(e), variant: 'destructive' });
+    }
+    setGenerating(false);
+  };
+
+
 
   const fetchPrayers = async () => {
     setLoading(true);
