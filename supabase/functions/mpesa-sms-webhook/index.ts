@@ -17,7 +17,7 @@ function parseMpesaSms(text: string): {
   const upper = text.toUpperCase();
 
   // Must be an M-Pesa related message
-  if (!upper.includes('MPESA') && !upper.includes('M-PESA') && !upper.includes('CONFIRMED') && !upper.includes('RECEIVED')) {
+  if (!upper.includes('MPESA') && !upper.includes('M-PESA') && !upper.includes('CONFIRMED') && !upper.includes('RECEIVED') && !upper.includes('M-KOBA')) {
     return null;
   }
 
@@ -25,17 +25,17 @@ function parseMpesaSms(text: string): {
   const txIdMatch = text.match(/\b([A-Z]{2,4}\d{7,10})\b/);
   if (!txIdMatch) return null;
 
-  // Amount: KES followed by number (with optional comma)
-  const amountMatch = text.match(/KES\s*([\d,]+(?:\.\d{2})?)/i);
+  // Amount: Tanzania M-Pesa uses TSh, but also accept KES/Tsh variants
+  const amountMatch = text.match(/(?:TSh|KES|Tsh)\s*([\d,]+(?:\.\d{2})?)/i);
   if (!amountMatch) return null;
 
-  // Phone number (Kenyan format)
-  const phoneMatch = text.match(/(07\d{8}|2547\d{8}|\+2547\d{8})/);
+  // Tanzania phone numbers: 07xx, 06xx, 2557xx, +2557xx
+  const phoneMatch = text.match(/(07\d{8}|06\d{8}|2557\d{8}|\+2557\d{8})/);
 
   // Name: between "from" or "received from" and phone/on
   const nameMatch =
-    text.match(/(?:from|received from|RECEIVED FROM)\s+([A-Z][A-Z\s]{2,40}?)(?:\s+\d|\s+on|\s+07|\s+254)/i) ||
-    text.match(/(?:sent to)\s+([A-Z][A-Z\s]{2,40}?)(?:\s+\d|\s+on|\s+07|\s+254)/i);
+    text.match(/(?:from|received from|RECEIVED FROM|kutoka kwa)\s+([A-Z][A-Z\s]{2,40}?)(?:\s+\d|\s+on|\s+07|\s+06|\s+255)/i) ||
+    text.match(/(?:sent to|kwenda kwa)\s+([A-Z][A-Z\s]{2,40}?)(?:\s+\d|\s+on|\s+07|\s+06|\s+255)/i);
 
   // Date: format d/m/yy or d/m/yyyy or dd/mm/yy
   const dateMatch = text.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);

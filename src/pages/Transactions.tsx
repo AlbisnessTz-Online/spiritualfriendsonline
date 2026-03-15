@@ -90,7 +90,7 @@ export default function TransactionsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Transactions</h1>
-          <p className="text-muted-foreground text-sm mt-1">{filtered.length} transaction{filtered.length !== 1 ? 's' : ''} · Total: <span className="font-semibold text-secondary">KES {total.toLocaleString()}</span></p>
+          <p className="text-muted-foreground text-sm mt-1">{filtered.length} transaction{filtered.length !== 1 ? 's' : ''} · Total: <span className="font-semibold text-secondary">TSh {total.toLocaleString()}</span></p>
         </div>
         <Button onClick={() => { setForm(emptyForm); setDialogOpen(true); }} className="gap-2">
           <Plus className="w-4 h-4" /> Add Transaction
@@ -127,7 +127,7 @@ export default function TransactionsPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
-                  {['Member Name', 'Phone', 'Amount (KES)', 'Transaction ID', 'Date', 'Source', ''].map((h) => (
+                  {['Member Name', 'Phone', 'Amount (TSh)', 'Transaction ID', 'Date', 'Source', ''].map((h) => (
                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{h}</th>
                   ))}
                 </tr>
@@ -175,7 +175,7 @@ export default function TransactionsPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Amount (KES)</Label>
+                <Label>Amount (TSh)</Label>
                 <Input type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="500" />
               </div>
               <div className="space-y-2">

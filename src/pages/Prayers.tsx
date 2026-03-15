@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, Loader2, BookOpen, Star } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, BookOpen, Star, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,6 +37,34 @@ export default function PrayersPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingPrayer, setEditingPrayer] = useState<Prayer | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [generating, setGenerating] = useState(false);
+
+  const generateTodaysPrayer = async () => {
+    setGenerating(true);
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const res = await fetch(`${supabaseUrl}/functions/v1/auto-daily-prayer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${anonKey}` },
+        body: JSON.stringify({ source: 'manual' }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast({ title: '✨ Prayer generated!', description: data.title });
+        fetchPrayers();
+      } else if (data.message?.includes('already exists')) {
+        toast({ title: 'Prayer already set for today', description: 'Edit it below if needed.' });
+      } else {
+        toast({ title: 'Generation failed', description: data.error || 'Try again', variant: 'destructive' });
+      }
+    } catch (e) {
+      toast({ title: 'Error', description: String(e), variant: 'destructive' });
+    }
+    setGenerating(false);
+  };
+
+
 
   const fetchPrayers = async () => {
     setLoading(true);
@@ -94,20 +122,26 @@ export default function PrayersPage() {
           <h1 className="text-2xl font-display font-bold text-foreground">Daily Prayers</h1>
           <p className="text-muted-foreground text-sm mt-1">Manage the group's daily prayer messages</p>
         </div>
-        <Button onClick={openAdd} className="gap-2">
-          <Plus className="w-4 h-4" /> Add Prayer
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={generateTodaysPrayer} disabled={generating} className="gap-2">
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {generating ? 'Generating...' : 'Auto-Generate (KkkT)'}
+          </Button>
+          <Button onClick={openAdd} className="gap-2">
+            <Plus className="w-4 h-4" /> Add Prayer
+          </Button>
+        </div>
       </div>
 
       {/* Today's prayer highlight */}
       {todayPrayer && (
-        <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg, hsl(221 83% 53%), hsl(158 64% 45%))' }}>
+        <div className="rounded-2xl p-6 bg-gradient-to-br from-primary to-secondary">
           <div className="flex items-center gap-2 mb-3">
-            <Star className="w-4 h-4 text-yellow-300 fill-yellow-300" />
-            <span className="text-white/80 text-xs font-semibold uppercase tracking-wide">Today's Active Prayer</span>
+            <Star className="w-4 h-4 text-accent fill-accent" />
+            <span className="text-primary-foreground/80 text-xs font-semibold uppercase tracking-wide">Today's Active Prayer · KkkT Calendar</span>
           </div>
-          <h2 className="text-white font-display font-bold text-xl mb-3">{todayPrayer.title}</h2>
-          <p className="text-white/85 leading-relaxed">{todayPrayer.content}</p>
+          <h2 className="text-primary-foreground font-display font-bold text-xl mb-3">{todayPrayer.title}</h2>
+          <p className="text-primary-foreground/85 leading-relaxed whitespace-pre-line">{todayPrayer.content}</p>
         </div>
       )}
 

@@ -70,13 +70,13 @@ export default function ReportsPage() {
   useEffect(() => { fetchReports(); }, [year]);
 
   const exportMonthlyCSV = () => {
-    const rows = [['Month', 'Total (KES)', 'Transactions'],
+    const rows = [['Month', 'Total (TSh)', 'Transactions'],
       ...monthlyData.map((r) => [r.month, r.total.toFixed(2), r.count])];
     download(rows, `monthly_report_${year}.csv`);
   };
 
   const exportMembersCSV = () => {
-    const rows = [['Member Name', 'Phone', 'Total (KES)', 'Transactions'],
+    const rows = [['Member Name', 'Phone', 'Total (TSh)', 'Transactions'],
       ...memberData.map((r) => [r.member_name, r.phone_number, r.total.toFixed(2), r.count])];
     download(rows, `member_contributions_${year}.csv`);
   };
@@ -100,7 +100,7 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Reports</h1>
-          <p className="text-muted-foreground text-sm mt-1">Year: {year} · Grand total: <span className="font-semibold text-secondary">KES {grandTotal.toLocaleString()}</span></p>
+          <p className="text-muted-foreground text-sm mt-1">Year: {year} · Grand total: <span className="font-semibold text-secondary">TSh {grandTotal.toLocaleString()}</span></p>
         </div>
         <div className="flex items-center gap-3">
           <div className="space-y-1">
@@ -142,7 +142,7 @@ export default function ReportsPage() {
                 <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
                 <Tooltip
                   contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
-                  formatter={(v: number) => [`KES ${v.toLocaleString()}`, 'Total']}
+                  formatter={(v: number) => [`TSh ${v.toLocaleString()}`, 'Total']}
                 />
                 <Bar dataKey="total" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
               </BarChart>
@@ -156,7 +156,7 @@ export default function ReportsPage() {
                 <tr className="bg-muted/50 border-b border-border">
                   <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Month</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Transactions</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total (KES)</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total (TSh)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -164,7 +164,7 @@ export default function ReportsPage() {
                   <tr key={row.month} className="hover:bg-muted/30">
                     <td className="px-5 py-3 font-medium text-foreground">{row.month} {year}</td>
                     <td className="px-5 py-3 text-muted-foreground">{row.count}</td>
-                    <td className="px-5 py-3 text-secondary font-semibold">{row.total.toLocaleString('en-KE', { minimumFractionDigits: 2 })}</td>
+                    <td className="px-5 py-3 text-secondary font-semibold">{row.total.toLocaleString('sw-TZ', { minimumFractionDigits: 2 })}</td>
                   </tr>
                 ))}
               </tbody>
@@ -191,7 +191,7 @@ export default function ReportsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-secondary font-bold">KES {m.total.toLocaleString()}</span>
+                  <span className="text-secondary font-bold">TSh {m.total.toLocaleString()}</span>
                   <TrendingUp className="w-4 h-4 text-muted-foreground group-open:rotate-180 transition-transform" />
                 </div>
               </summary>
@@ -199,7 +199,7 @@ export default function ReportsPage() {
                 {m.transactions.map((tx, i) => (
                   <div key={i} className="flex items-center justify-between px-5 py-2.5">
                     <span className="text-muted-foreground text-sm">{tx.transaction_date} · <span className="font-mono text-xs">{tx.transaction_id}</span></span>
-                    <span className="text-foreground font-medium text-sm">KES {tx.amount.toLocaleString()}</span>
+                    <span className="text-foreground font-medium text-sm">TSh {tx.amount.toLocaleString()}</span>
                   </div>
                 ))}
               </div>

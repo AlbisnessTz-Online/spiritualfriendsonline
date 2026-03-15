@@ -91,7 +91,7 @@ export default function DashboardPage() {
     fetchStats();
   }, []);
 
-  const fmt = (n: number) => `KES ${n.toLocaleString('en-KE', { minimumFractionDigits: 2 })}`;
+  const fmt = (n: number) => `TSh ${n.toLocaleString('sw-TZ', { minimumFractionDigits: 2 })}`;
 
   if (loading) {
     return (
@@ -153,7 +153,7 @@ export default function DashboardPage() {
             <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
             <Tooltip
               contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
-              formatter={(v: number) => [`KES ${v.toLocaleString()}`, 'Contributions']}
+              formatter={(v: number) => [`TSh ${v.toLocaleString()}`, 'Contributions']}
             />
             <Bar dataKey="total" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
           </BarChart>
@@ -176,7 +176,7 @@ export default function DashboardPage() {
                   <p className="font-medium text-foreground text-sm">{tx.member_name}</p>
                   <p className="text-xs text-muted-foreground">{tx.transaction_id} · {tx.transaction_date}</p>
                 </div>
-                <span className="text-secondary font-semibold text-sm">+KES {Number(tx.amount).toLocaleString()}</span>
+                <span className="text-secondary font-semibold text-sm">+TSh {Number(tx.amount).toLocaleString()}</span>
               </div>
             ))}
           </div>
