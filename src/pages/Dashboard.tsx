@@ -91,7 +91,7 @@ export default function DashboardPage() {
     fetchStats();
   }, []);
 
-  const fmt = (n: number) => `KES ${n.toLocaleString('en-KE', { minimumFractionDigits: 2 })}`;
+  const fmt = (n: number) => `TSh ${n.toLocaleString('sw-TZ', { minimumFractionDigits: 2 })}`;
 
   if (loading) {
     return (
