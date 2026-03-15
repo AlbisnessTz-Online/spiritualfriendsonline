@@ -142,7 +142,7 @@ export default function ReportsPage() {
                 <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
                 <Tooltip
                   contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
-                  formatter={(v: number) => [`KES ${v.toLocaleString()}`, 'Total']}
+                  formatter={(v: number) => [`TSh ${v.toLocaleString()}`, 'Total']}
                 />
                 <Bar dataKey="total" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
               </BarChart>
