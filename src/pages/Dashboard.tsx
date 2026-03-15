@@ -176,7 +176,7 @@ export default function DashboardPage() {
                   <p className="font-medium text-foreground text-sm">{tx.member_name}</p>
                   <p className="text-xs text-muted-foreground">{tx.transaction_id} · {tx.transaction_date}</p>
                 </div>
-                <span className="text-secondary font-semibold text-sm">+KES {Number(tx.amount).toLocaleString()}</span>
+                <span className="text-secondary font-semibold text-sm">+TSh {Number(tx.amount).toLocaleString()}</span>
               </div>
             ))}
           </div>
