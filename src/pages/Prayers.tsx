@@ -137,7 +137,7 @@ export default function PrayersPage() {
       {todayPrayer && (
         <div className="rounded-2xl p-6 bg-gradient-to-br from-primary to-secondary">
           <div className="flex items-center gap-2 mb-3">
-            <Star className="w-4 h-4 text-yellow-300 fill-yellow-300" />
+            <Star className="w-4 h-4 text-accent fill-accent" />
             <span className="text-primary-foreground/80 text-xs font-semibold uppercase tracking-wide">Today's Active Prayer · KkkT Calendar</span>
           </div>
           <h2 className="text-primary-foreground font-display font-bold text-xl mb-3">{todayPrayer.title}</h2>
