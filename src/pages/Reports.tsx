@@ -76,7 +76,7 @@ export default function ReportsPage() {
   };
 
   const exportMembersCSV = () => {
-    const rows = [['Member Name', 'Phone', 'Total (KES)', 'Transactions'],
+    const rows = [['Member Name', 'Phone', 'Total (TSh)', 'Transactions'],
       ...memberData.map((r) => [r.member_name, r.phone_number, r.total.toFixed(2), r.count])];
     download(rows, `member_contributions_${year}.csv`);
   };
