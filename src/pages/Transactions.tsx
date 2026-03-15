@@ -90,7 +90,7 @@ export default function TransactionsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Transactions</h1>
-          <p className="text-muted-foreground text-sm mt-1">{filtered.length} transaction{filtered.length !== 1 ? 's' : ''} · Total: <span className="font-semibold text-secondary">KES {total.toLocaleString()}</span></p>
+          <p className="text-muted-foreground text-sm mt-1">{filtered.length} transaction{filtered.length !== 1 ? 's' : ''} · Total: <span className="font-semibold text-secondary">TSh {total.toLocaleString()}</span></p>
         </div>
         <Button onClick={() => { setForm(emptyForm); setDialogOpen(true); }} className="gap-2">
           <Plus className="w-4 h-4" /> Add Transaction
