@@ -1,0 +1,214 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Plus, Edit2, Trash2, Loader2, BookOpen, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+interface Prayer {
+  id: string;
+  title: string;
+  content: string;
+  prayer_date: string;
+  is_active: boolean;
+}
+
+const emptyForm = {
+  title: '', content: '',
+  prayer_date: new Date().toISOString().split('T')[0],
+  is_active: false,
+};
+
+export default function PrayersPage() {
+  const { toast } = useToast();
+  const [prayers, setPrayers] = useState<Prayer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editingPrayer, setEditingPrayer] = useState<Prayer | null>(null);
+  const [form, setForm] = useState(emptyForm);
+
+  const fetchPrayers = async () => {
+    setLoading(true);
+    const { data } = await supabase.from('prayers').select('*').order('prayer_date', { ascending: false });
+    setPrayers(data || []);
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchPrayers(); }, []);
+
+  const openAdd = () => { setEditingPrayer(null); setForm(emptyForm); setDialogOpen(true); };
+  const openEdit = (p: Prayer) => {
+    setEditingPrayer(p);
+    setForm({ title: p.title, content: p.content, prayer_date: p.prayer_date, is_active: p.is_active });
+    setDialogOpen(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.title || !form.content) {
+      toast({ title: 'Validation error', description: 'Title and content are required.', variant: 'destructive' });
+      return;
+    }
+    setSaving(true);
+    if (editingPrayer) {
+      const { error } = await supabase.from('prayers').update(form).eq('id', editingPrayer.id);
+      if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      else { toast({ title: 'Prayer updated' }); setDialogOpen(false); fetchPrayers(); }
+    } else {
+      const { error } = await supabase.from('prayers').insert(form);
+      if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      else { toast({ title: 'Prayer added' }); setDialogOpen(false); fetchPrayers(); }
+    }
+    setSaving(false);
+  };
+
+  const toggleActive = async (p: Prayer) => {
+    const { error } = await supabase.from('prayers').update({ is_active: !p.is_active }).eq('id', p.id);
+    if (!error) fetchPrayers();
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from('prayers').delete().eq('id', deleteId);
+    if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    else { toast({ title: 'Prayer deleted' }); fetchPrayers(); }
+    setDeleteId(null);
+  };
+
+  const todayPrayer = prayers.find((p) => p.prayer_date === new Date().toISOString().split('T')[0] && p.is_active);
+
+  return (
+    <div className="space-y-6 max-w-4xl">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-display font-bold text-foreground">Daily Prayers</h1>
+          <p className="text-muted-foreground text-sm mt-1">Manage the group's daily prayer messages</p>
+        </div>
+        <Button onClick={openAdd} className="gap-2">
+          <Plus className="w-4 h-4" /> Add Prayer
+        </Button>
+      </div>
+
+      {/* Today's prayer highlight */}
+      {todayPrayer && (
+        <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg, hsl(221 83% 53%), hsl(158 64% 45%))' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <Star className="w-4 h-4 text-yellow-300 fill-yellow-300" />
+            <span className="text-white/80 text-xs font-semibold uppercase tracking-wide">Today's Active Prayer</span>
+          </div>
+          <h2 className="text-white font-display font-bold text-xl mb-3">{todayPrayer.title}</h2>
+          <p className="text-white/85 leading-relaxed">{todayPrayer.content}</p>
+        </div>
+      )}
+
+      {/* Prayer list */}
+      {loading ? (
+        <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+      ) : prayers.length === 0 ? (
+        <div className="bg-card rounded-2xl border border-border py-16 text-center">
+          <BookOpen className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+          <p className="text-muted-foreground mb-4">No prayers yet.</p>
+          <Button onClick={openAdd}>Add first prayer</Button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {prayers.map((p) => (
+            <div key={p.id} className={`bg-card rounded-xl border p-5 transition-all ${p.is_active ? 'border-primary/40 shadow-sm' : 'border-border'}`}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-display font-semibold text-foreground truncate">{p.title}</h3>
+                    {p.is_active && (
+                      <span className="flex-shrink-0 px-2 py-0.5 bg-secondary/15 text-secondary text-xs font-medium rounded-full">Active</span>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground text-xs mb-2">{p.prayer_date}</p>
+                  <p className="text-foreground/80 text-sm leading-relaxed line-clamp-3">{p.content}</p>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button
+                    onClick={() => toggleActive(p)}
+                    title={p.is_active ? 'Deactivate' : 'Set as active'}
+                    className={`p-1.5 rounded-lg transition-colors ${p.is_active ? 'text-secondary hover:bg-secondary/10' : 'text-muted-foreground hover:bg-muted'}`}
+                  >
+                    <Star className={`w-4 h-4 ${p.is_active ? 'fill-secondary' : ''}`} />
+                  </button>
+                  <button onClick={() => openEdit(p)} className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground">
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={() => setDeleteId(p.id)} className="p-1.5 hover:bg-destructive/10 rounded-lg transition-colors text-muted-foreground hover:text-destructive">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{editingPrayer ? 'Edit Prayer' : 'Add Prayer'}</DialogTitle></DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Prayer title..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Prayer Date</Label>
+              <Input type="date" value={form.prayer_date} onChange={(e) => setForm({ ...form, prayer_date: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Prayer Content</Label>
+              <Textarea
+                value={form.content}
+                onChange={(e) => setForm({ ...form, content: e.target.value })}
+                placeholder="Write the prayer message here..."
+                rows={6}
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox" id="active" checked={form.is_active}
+                onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
+                className="w-4 h-4 accent-primary"
+              />
+              <Label htmlFor="active" className="cursor-pointer">Set as today's active prayer</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {editingPrayer ? 'Save Changes' : 'Add Prayer'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Prayer?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
