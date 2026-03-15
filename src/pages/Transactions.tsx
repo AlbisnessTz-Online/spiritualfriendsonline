@@ -127,7 +127,7 @@ export default function TransactionsPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
-                  {['Member Name', 'Phone', 'Amount (KES)', 'Transaction ID', 'Date', 'Source', ''].map((h) => (
+                  {['Member Name', 'Phone', 'Amount (TSh)', 'Transaction ID', 'Date', 'Source', ''].map((h) => (
                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{h}</th>
                   ))}
                 </tr>
