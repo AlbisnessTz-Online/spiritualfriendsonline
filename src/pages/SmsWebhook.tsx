@@ -174,7 +174,7 @@ export default function SmsWebhookPage() {
                   <p className="font-medium text-foreground text-sm">{tx.member_name}</p>
                   <p className="text-xs text-muted-foreground">{tx.transaction_id} · {tx.transaction_date}</p>
                 </div>
-                <span className="text-secondary font-semibold">KES {Number(tx.amount).toLocaleString()}</span>
+                <span className="text-secondary font-semibold">TSh {Number(tx.amount).toLocaleString()}</span>
               </div>
             ))}
           </div>

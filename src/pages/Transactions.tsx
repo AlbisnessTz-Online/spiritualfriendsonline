@@ -175,7 +175,7 @@ export default function TransactionsPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Amount (KES)</Label>
+                <Label>Amount (TSh)</Label>
                 <Input type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="500" />
               </div>
               <div className="space-y-2">

@@ -189,7 +189,7 @@ export default function SmsImportPage() {
                       </td>
                       <td className="px-4 py-2.5 text-foreground">{row.member_name || <span className="text-muted-foreground italic">{row.raw.slice(0, 40)}...</span>}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">{row.phone_number}</td>
-                      <td className="px-4 py-2.5 text-secondary font-medium">{row.amount ? `KES ${row.amount.toLocaleString()}` : '—'}</td>
+                      <td className="px-4 py-2.5 text-secondary font-medium">{row.amount ? `TSh ${row.amount.toLocaleString()}` : '—'}</td>
                       <td className="px-4 py-2.5 text-muted-foreground font-mono text-xs">{row.transaction_id || '—'}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">{row.transaction_date || '—'}</td>
                     </tr>

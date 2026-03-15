@@ -199,7 +199,7 @@ export default function ReportsPage() {
                 {m.transactions.map((tx, i) => (
                   <div key={i} className="flex items-center justify-between px-5 py-2.5">
                     <span className="text-muted-foreground text-sm">{tx.transaction_date} · <span className="font-mono text-xs">{tx.transaction_id}</span></span>
-                    <span className="text-foreground font-medium text-sm">KES {tx.amount.toLocaleString()}</span>
+                    <span className="text-foreground font-medium text-sm">TSh {tx.amount.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
