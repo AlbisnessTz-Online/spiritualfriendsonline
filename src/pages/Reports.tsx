@@ -156,7 +156,7 @@ export default function ReportsPage() {
                 <tr className="bg-muted/50 border-b border-border">
                   <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Month</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Transactions</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total (KES)</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total (TSh)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
