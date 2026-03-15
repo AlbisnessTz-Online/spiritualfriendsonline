@@ -36,6 +36,7 @@ export default function PrayersPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingPrayer, setEditingPrayer] = useState<Prayer | null>(null);
+  const [form, setForm] = useState(emptyForm);
   const [generating, setGenerating] = useState(false);
 
   const generateTodaysPrayer = async () => {
