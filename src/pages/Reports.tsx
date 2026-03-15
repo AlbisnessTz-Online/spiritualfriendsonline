@@ -70,7 +70,7 @@ export default function ReportsPage() {
   useEffect(() => { fetchReports(); }, [year]);
 
   const exportMonthlyCSV = () => {
-    const rows = [['Month', 'Total (KES)', 'Transactions'],
+    const rows = [['Month', 'Total (TSh)', 'Transactions'],
       ...monthlyData.map((r) => [r.month, r.total.toFixed(2), r.count])];
     download(rows, `monthly_report_${year}.csv`);
   };
