@@ -78,7 +78,17 @@ function getTanzaniaDate(): Date {
   return new Date(now.getTime() + 3 * 60 * 60 * 1000);
 }
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
 Deno.serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   // Allow manual trigger or cron
   if (req.method !== "POST" && req.method !== "GET") {
     return new Response("Method not allowed", { status: 405 });
@@ -98,7 +108,7 @@ Deno.serve(async (req) => {
     if (existing) {
       return new Response(
         JSON.stringify({ message: "Prayer already exists for today", date: todayStr }),
-        { headers: { "Content-Type": "application/json" }, status: 200 }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
 
@@ -173,13 +183,13 @@ PRAYER: [maombi]`;
 
     return new Response(
       JSON.stringify({ success: true, date: todayStr, title, context: liturgicalContext }),
-      { headers: { "Content-Type": "application/json" }, status: 200 }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
   } catch (err) {
     console.error("auto-daily-prayer error:", err);
     return new Response(
       JSON.stringify({ error: String(err) }),
-      { headers: { "Content-Type": "application/json" }, status: 500 }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }
 });
