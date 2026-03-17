@@ -132,7 +132,7 @@ VERSE: [mstari wa Biblia - Kitabu Sura:Aya - "maandishi"]
 PRAYER: [maombi]`;
 
     // Call Lovable AI (OpenAI compatible)
-    const aiRes = await fetch("https://lovable.dev/functions/v1/ai-gateway", {
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
