@@ -183,13 +183,13 @@ PRAYER: [maombi]`;
 
     return new Response(
       JSON.stringify({ success: true, date: todayStr, title, context: liturgicalContext }),
-      { headers: { "Content-Type": "application/json" }, status: 200 }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
   } catch (err) {
     console.error("auto-daily-prayer error:", err);
     return new Response(
       JSON.stringify({ error: String(err) }),
-      { headers: { "Content-Type": "application/json" }, status: 500 }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }
 });
