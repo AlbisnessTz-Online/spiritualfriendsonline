@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
     if (existing) {
       return new Response(
         JSON.stringify({ message: "Prayer already exists for today", date: todayStr }),
-        { headers: { "Content-Type": "application/json" }, status: 200 }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
 
