@@ -17,6 +17,7 @@ import LeadersPage from "./pages/Leaders";
 import ReportsPage from "./pages/Reports";
 import PrayersPage from "./pages/Prayers";
 import NotFound from "./pages/NotFound";
+import AboutPage from "./pages/About";
 
 const queryClient = new QueryClient();
 
