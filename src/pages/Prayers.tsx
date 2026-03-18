@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, Loader2, BookOpen, Star, Sparkles } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, BookOpen, Star, Sparkles, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
