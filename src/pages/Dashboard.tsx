@@ -145,7 +145,7 @@ export default function DashboardPage() {
 
       {/* Chart */}
       <div className="bg-card rounded-2xl border border-border p-6">
-        <h2 className="font-display font-semibold text-foreground mb-4">Monthly Contributions (KES)</h2>
+        <h2 className="font-display font-semibold text-foreground mb-4">Monthly Contributions (TSh)</h2>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={stats.monthlyData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
