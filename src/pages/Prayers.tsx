@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, Loader2, BookOpen, Star, Sparkles } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, BookOpen, Star, Sparkles, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -136,12 +136,27 @@ export default function PrayersPage() {
       {/* Today's prayer highlight */}
       {todayPrayer && (
         <div className="rounded-2xl p-6 bg-gradient-to-br from-primary to-secondary">
-          <div className="flex items-center gap-2 mb-3">
-            <Star className="w-4 h-4 text-accent fill-accent" />
-            <span className="text-primary-foreground/80 text-xs font-semibold uppercase tracking-wide">Today's Active Prayer · KkkT Calendar</span>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-4 h-4 text-accent fill-accent" />
+                <span className="text-primary-foreground/80 text-xs font-semibold uppercase tracking-wide">Today's Active Prayer · KkkT Calendar</span>
+              </div>
+              <h2 className="text-primary-foreground font-display font-bold text-xl mb-3">{todayPrayer.title}</h2>
+              <p className="text-primary-foreground/85 leading-relaxed whitespace-pre-line">{todayPrayer.content}</p>
+            </div>
+            <button
+              onClick={() => {
+                const text = `🙏 *${todayPrayer.title}*\n\n${todayPrayer.content}\n\n_KkkT · ${todayPrayer.prayer_date}_`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+              }}
+              title="Share on WhatsApp"
+              className="flex-shrink-0 flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-primary-foreground text-xs font-semibold px-3 py-2 rounded-xl transition-colors"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              Share
+            </button>
           </div>
-          <h2 className="text-primary-foreground font-display font-bold text-xl mb-3">{todayPrayer.title}</h2>
-          <p className="text-primary-foreground/85 leading-relaxed whitespace-pre-line">{todayPrayer.content}</p>
         </div>
       )}
 
