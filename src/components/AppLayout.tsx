@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Users, CreditCard, FileText, BookOpen,
-  Upload, LogOut, Menu, X, Cross, Crown, Smartphone
+  Upload, LogOut, Menu, X, Cross, Crown, Smartphone, Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
