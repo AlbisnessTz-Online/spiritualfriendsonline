@@ -17,6 +17,7 @@ import LeadersPage from "./pages/Leaders";
 import ReportsPage from "./pages/Reports";
 import PrayersPage from "./pages/Prayers";
 import NotFound from "./pages/NotFound";
+import AboutPage from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/leaders" element={<ProtectedRoute><AppLayout><LeadersPage /></AppLayout></ProtectedRoute>} />
             <Route path="/reports" element={<ProtectedRoute><AppLayout><ReportsPage /></AppLayout></ProtectedRoute>} />
             <Route path="/prayers" element={<ProtectedRoute><AppLayout><PrayersPage /></AppLayout></ProtectedRoute>} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Users, CreditCard, FileText, BookOpen,
-  Upload, LogOut, Menu, X, Cross, Crown, Smartphone
+  Upload, LogOut, Menu, X, Cross, Crown, Smartphone, Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -16,7 +16,9 @@ const navItems = [
   { label: 'Auto SMS', href: '/sms-webhook', icon: Smartphone },
   { label: 'Reports', href: '/reports', icon: FileText },
   { label: 'Daily Prayer', href: '/prayers', icon: BookOpen },
+  { label: 'About', href: '/about', icon: Star },
 ];
+
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { signOut, user } = useAuth();
