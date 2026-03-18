@@ -16,7 +16,9 @@ const navItems = [
   { label: 'Auto SMS', href: '/sms-webhook', icon: Smartphone },
   { label: 'Reports', href: '/reports', icon: FileText },
   { label: 'Daily Prayer', href: '/prayers', icon: BookOpen },
+  { label: 'About', href: '/about', icon: Star },
 ];
+
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { signOut, user } = useAuth();
