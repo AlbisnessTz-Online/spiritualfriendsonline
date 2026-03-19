@@ -149,6 +149,18 @@ const t = {
     gratitudeHeading: 'Mioyo ya Shukrani',
     gratitudeText:
       'Tunashukuru sana kwa uaminifu wa Mungu — kutoka wanachama sita hadi zaidi ya ishirini, kila hatua imeongozwa na Mkono Wake. Tunaadhimisha umoja, upendo, na uvumilivu ambao umebeba Marafiki wa Kiroho hadi hapa. Kilicho bora bado kiko mbele.',
+    contactHeading: 'Wasiliana Nasi',
+    contactSubtitle: 'Tungependa kukusikia! Wasiliana na viongozi wetu moja kwa moja kupitia WhatsApp au tuma ujumbe.',
+    contactName: 'Jina Lako',
+    contactMessage: 'Ujumbe Wako',
+    contactSend: 'Tuma kupitia WhatsApp',
+    contactWhatsAppLabel: 'Piga Gumzo WhatsApp',
+    contactLeadersHeading: 'Viongozi Wetu',
+    contactLeaders: [
+      { name: 'Albert Mamuya', role: 'Mwenyekiti', phone: '255700000001' },
+      { name: 'Godlisten Makundi', role: 'Katibu', phone: '255700000002' },
+      { name: 'Verynice Kimei', role: 'Mweka Hazina', phone: '255700000003' },
+    ],
     footerText: '© {year} Marafiki wa Kiroho · Imejengwa kwa upendo ✝️',
     themeLight: 'Mwanga',
     themeDark: 'Giza',
