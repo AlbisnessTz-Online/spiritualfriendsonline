@@ -6,6 +6,7 @@ import {
   MessageCircle, Phone, Send
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAppTheme } from '@/contexts/ThemeContext';
 
 // ─────────────────────────────────────────────
 // TRANSLATIONS
