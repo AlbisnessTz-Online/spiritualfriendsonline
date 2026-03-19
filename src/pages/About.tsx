@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Cross, Heart, Target, Eye, TrendingUp, Users, Star, BookOpen,
-  Globe, Sun, Moon, LogIn, ChevronDown, Handshake, Sprout, Lightbulb
+  Globe, Sun, Moon, LogIn, ChevronDown, Handshake, Sprout, Lightbulb,
+  MessageCircle, Phone, Send
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
