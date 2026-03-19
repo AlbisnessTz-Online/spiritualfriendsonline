@@ -409,8 +409,7 @@ const themeVars: Record<Theme, React.CSSProperties> = {
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
 export default function AboutPage() {
-  const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('sf-lang') as Lang) || 'en');
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('sf-theme') as Theme) || 'light');
+  const { theme, setTheme, lang, setLang } = useAppTheme();
   const [langOpen, setLangOpen] = useState(false);
 
   const txt = t[lang];
