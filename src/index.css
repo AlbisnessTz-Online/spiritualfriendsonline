@@ -5,40 +5,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 /* Spiritual Friends Management System – Design Tokens */
+/* Default tokens (light theme — overridden by html.theme-* classes below) */
 
 @layer base {
   :root {
     --background: 210 40% 98%;
     --foreground: 220 25% 15%;
-
     --card: 0 0% 100%;
     --card-foreground: 220 25% 15%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 15%;
-
     --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
-
     --secondary: 158 64% 45%;
     --secondary-foreground: 0 0% 100%;
-
     --muted: 210 30% 94%;
     --muted-foreground: 220 15% 50%;
-
     --accent: 38 92% 56%;
     --accent-foreground: 0 0% 100%;
-
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-
     --border: 210 25% 88%;
     --input: 210 25% 88%;
     --ring: 221 83% 53%;
-
     --radius: 0.75rem;
-
-    /* Sidebar tokens */
     --sidebar-background: 222 47% 17%;
     --sidebar-foreground: 210 40% 90%;
     --sidebar-primary: 221 83% 53%;
@@ -47,36 +37,6 @@
     --sidebar-accent-foreground: 210 40% 95%;
     --sidebar-border: 222 40% 22%;
     --sidebar-ring: 221 83% 53%;
-  }
-
-  .dark {
-    --background: 222 47% 8%;
-    --foreground: 210 40% 95%;
-    --card: 222 40% 12%;
-    --card-foreground: 210 40% 95%;
-    --popover: 222 40% 12%;
-    --popover-foreground: 210 40% 95%;
-    --primary: 221 83% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 158 64% 40%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 222 35% 18%;
-    --muted-foreground: 220 20% 60%;
-    --accent: 38 92% 56%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 222 30% 22%;
-    --input: 222 30% 22%;
-    --ring: 221 83% 60%;
-    --sidebar-background: 222 47% 10%;
-    --sidebar-foreground: 210 40% 85%;
-    --sidebar-primary: 221 83% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 40% 15%;
-    --sidebar-accent-foreground: 210 40% 90%;
-    --sidebar-border: 222 35% 16%;
-    --sidebar-ring: 221 83% 60%;
   }
 }
 
