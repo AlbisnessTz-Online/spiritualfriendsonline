@@ -244,7 +244,128 @@ function FadeIn({ children, delay = 0, className = '' }: { children: React.React
 }
 
 // ─────────────────────────────────────────────
-// THEME STYLES
+// CONTACT SECTION
+// ─────────────────────────────────────────────
+type TxtType = typeof t['en'];
+
+function ContactSection({ txt }: { txt: TxtType }) {
+  const [name, setName] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleWhatsApp = (phone: string, prefill?: string) => {
+    const text = prefill ?? (name && message
+      ? `Hello, I'm ${name}. ${message}`
+      : 'Hello! I found you through the Spiritual Friends website.');
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Send to group WhatsApp (first leader as default contact)
+    handleWhatsApp(txt.contactLeaders[0].phone, `Hello, I'm ${name}. ${message}`);
+  };
+
+  return (
+    <FadeIn>
+      <section>
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white"
+            style={{ background: 'var(--about-accent)' }}>
+            <MessageCircle className="w-6 h-6" />
+          </div>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: 'var(--about-accent)' }}>
+            {txt.contactHeading}
+          </p>
+          <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--about-muted)' }}>{txt.contactSubtitle}</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Quick WhatsApp cards per leader */}
+          <div
+            className="rounded-2xl border p-6 flex flex-col gap-4"
+            style={{ backgroundColor: 'var(--about-surface)', borderColor: 'var(--about-border)', boxShadow: 'var(--about-card-shadow)' }}
+          >
+            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--about-accent)' }}>
+              {txt.contactLeadersHeading}
+            </h3>
+            {txt.contactLeaders.map((leader) => (
+              <button
+                key={leader.phone}
+                onClick={() => handleWhatsApp(leader.phone)}
+                className="flex items-center gap-3 w-full rounded-xl px-4 py-3 text-left transition-all duration-200 hover:scale-[1.02] active:scale-95"
+                style={{ background: 'hsl(142 76% 95%)', border: '1px solid hsl(142 76% 80%)' }}
+              >
+                <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'hsl(142 76% 36%)' }}>
+                  <Phone className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm truncate" style={{ color: 'hsl(142 76% 20%)' }}>{leader.name}</div>
+                  <div className="text-xs" style={{ color: 'hsl(142 76% 35%)' }}>{leader.role}</div>
+                </div>
+                <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="hsl(142 76% 36%)">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                  <path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.99.574 3.847 1.569 5.418L2.05 21.96l4.656-1.496A9.953 9.953 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-1.72 0-3.332-.463-4.72-1.271l-.337-.201-3.498 1.124 1.127-3.404-.22-.349A7.944 7.944 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
+                </svg>
+              </button>
+            ))}
+          </div>
+
+          {/* Message form */}
+          <form
+            onSubmit={handleFormSubmit}
+            className="rounded-2xl border p-6 flex flex-col gap-4"
+            style={{ backgroundColor: 'var(--about-surface)', borderColor: 'var(--about-border)', boxShadow: 'var(--about-card-shadow)' }}
+          >
+            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--about-accent)' }}>
+              {txt.contactSend}
+            </h3>
+            <div>
+              <input
+                type="text"
+                placeholder={txt.contactName}
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+                className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none transition-all"
+                style={{
+                  backgroundColor: 'var(--about-bg)',
+                  borderColor: 'var(--about-border)',
+                  color: 'var(--about-text)',
+                }}
+              />
+            </div>
+            <div>
+              <textarea
+                placeholder={txt.contactMessage}
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                required
+                rows={4}
+                className="w-full rounded-xl border px-4 py-2.5 text-sm outline-none transition-all resize-none"
+                style={{
+                  backgroundColor: 'var(--about-bg)',
+                  borderColor: 'var(--about-border)',
+                  color: 'var(--about-text)',
+                }}
+              />
+            </div>
+            <button
+              type="submit"
+              className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95"
+              style={{ background: 'hsl(142 76% 36%)' }}
+            >
+              <Send className="w-4 h-4" />
+              {txt.contactSend}
+            </button>
+          </form>
+        </div>
+      </section>
+    </FadeIn>
+  );
+}
+
+
 // ─────────────────────────────────────────────
 const themeVars: Record<Theme, React.CSSProperties> = {
   light: {
