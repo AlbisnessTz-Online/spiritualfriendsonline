@@ -70,6 +70,18 @@ const t = {
     gratitudeHeading: 'Grateful Hearts',
     gratitudeText:
       'We are deeply grateful to God for His faithfulness — from six to twenty-plus members, every step has been guided by His hand. We celebrate the unity, love, and perseverance that have carried Spiritual Friends this far. The best is still ahead.',
+    contactHeading: 'Connect With Us',
+    contactSubtitle: 'We\'d love to hear from you! Reach out to our leaders directly via WhatsApp or send us a message.',
+    contactName: 'Your Name',
+    contactMessage: 'Your Message',
+    contactSend: 'Send via WhatsApp',
+    contactWhatsAppLabel: 'Chat on WhatsApp',
+    contactLeadersHeading: 'Our Leaders',
+    contactLeaders: [
+      { name: 'Albert Mamuya', role: 'Chairperson', phone: '255700000001' },
+      { name: 'Godlisten Makundi', role: 'Secretary', phone: '255700000002' },
+      { name: 'Verynice Kimei', role: 'Treasurer', phone: '255700000003' },
+    ],
     footerText: '© {year} Spiritual Friends · Built with love ✝️',
     themeLight: 'Light',
     themeDark: 'Dark',
