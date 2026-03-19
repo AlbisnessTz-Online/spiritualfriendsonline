@@ -609,6 +609,9 @@ export default function AboutPage() {
           </section>
         </FadeIn>
 
+        {/* ── CONTACT ── */}
+        <ContactSection txt={txt} />
+
         {/* ── GRATITUDE ── */}
         <FadeIn>
           <section
