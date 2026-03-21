@@ -437,6 +437,7 @@ export default function HomePage() {
             </div>
           </div>
         </FadeIn>
+        </div>
 
         {/* ── SCRIPTURE ──────────────────────────────────────────────────── */}
         <FadeIn delay={100} className="py-10 text-center">
