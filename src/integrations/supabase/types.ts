@@ -47,6 +47,45 @@ export type Database = {
         }
         Relationships: []
       }
+      member_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_verified: boolean
+          joined_at: string
+          phone_number: string | null
+          subscribed_announcements: boolean
+          subscribed_daily_prayer: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          is_verified?: boolean
+          joined_at?: string
+          phone_number?: string | null
+          subscribed_announcements?: boolean
+          subscribed_daily_prayer?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_verified?: boolean
+          joined_at?: string
+          phone_number?: string | null
+          subscribed_announcements?: boolean
+          subscribed_daily_prayer?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       members: {
         Row: {
           created_at: string
