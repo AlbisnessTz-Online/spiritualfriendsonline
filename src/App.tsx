@@ -33,6 +33,8 @@ const App = () => (
           <AuthProvider>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              {/* Admin login is at /admin — secret URL, not visible on homepage */}
+              <Route path="/admin" element={<LoginPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/dashboard" element={<ProtectedRoute><AppLayout><DashboardPage /></AppLayout></ProtectedRoute>} />
               <Route path="/members" element={<ProtectedRoute><AppLayout><MembersPage /></AppLayout></ProtectedRoute>} />
@@ -54,3 +56,4 @@ const App = () => (
 );
 
 export default App;
+
