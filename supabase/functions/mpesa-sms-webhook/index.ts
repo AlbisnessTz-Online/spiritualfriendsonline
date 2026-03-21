@@ -72,6 +72,62 @@ function parseMpesaSms(text: string): {
   };
 }
 
+/**
+ * Robustly extract SMS text from any request format.
+ * SMS forwarder apps send many different formats — handle them all.
+ */
+async function extractSmsText(req: Request): Promise<string> {
+  const contentType = req.headers.get('content-type') || '';
+
+  // Clone so we can read body multiple times if needed
+  const rawText = await req.text();
+
+  if (!rawText || rawText.trim() === '') return '';
+
+  // 1. Try JSON first (works for application/json and some apps without proper content-type)
+  try {
+    const body = JSON.parse(rawText);
+    const smsText =
+      body.message ||
+      body.sms ||
+      body.body ||
+      body.text ||
+      body.content ||
+      body.msg ||
+      body.Message ||
+      body.SMS ||
+      body.Body ||
+      '';
+    if (smsText) return String(smsText);
+  } catch {
+    // Not JSON, continue
+  }
+
+  // 2. Try URL-encoded form data
+  if (contentType.includes('application/x-www-form-urlencoded') || rawText.includes('=')) {
+    try {
+      const params = new URLSearchParams(rawText);
+      const smsText =
+        params.get('message') ||
+        params.get('sms') ||
+        params.get('body') ||
+        params.get('text') ||
+        params.get('content') ||
+        params.get('msg') ||
+        params.get('Message') ||
+        params.get('SMS') ||
+        params.get('Body') ||
+        '';
+      if (smsText) return smsText;
+    } catch {
+      // Not URL-encoded, continue
+    }
+  }
+
+  // 3. Treat the raw body itself as the SMS text (some apps POST raw text)
+  return rawText.trim();
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -97,45 +153,16 @@ serve(async (req) => {
       }
     }
 
-    let smsText = '';
-
-    const contentType = req.headers.get('content-type') || '';
-
-    if (contentType.includes('application/json')) {
-      const body = await req.json();
-      // Support multiple SMS forwarder app formats
-      smsText =
-        body.message ||
-        body.sms ||
-        body.body ||
-        body.text ||
-        body.content ||
-        body.msg ||
-        '';
-    } else if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
-      const form = await req.formData();
-      smsText =
-        form.get('message')?.toString() ||
-        form.get('sms')?.toString() ||
-        form.get('body')?.toString() ||
-        form.get('text')?.toString() ||
-        '';
-    } else {
-      // Try JSON as fallback
-      try {
-        const body = await req.json();
-        smsText = body.message || body.sms || body.body || body.text || '';
-      } catch {
-        smsText = await req.text();
-      }
-    }
+    const smsText = await extractSmsText(req);
 
     if (!smsText) {
-      return new Response(JSON.stringify({ error: 'No SMS text provided', received_body: 'empty' }), {
+      return new Response(JSON.stringify({ error: 'No SMS text provided' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    console.log('Received SMS text:', smsText.slice(0, 200));
 
     const parsed = parseMpesaSms(smsText);
 
