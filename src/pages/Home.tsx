@@ -351,7 +351,8 @@ export default function HomePage() {
         </FadeIn>
 
         {/* ── JOIN / SIGNUP ──────────────────────────────────────────────── */}
-        <FadeIn delay={200} className="py-8" id="join">
+        <div id="join">
+        <FadeIn delay={200} className="py-8">
           <div className="rounded-3xl overflow-hidden border border-border shadow-xl">
             {/* Header */}
             <div className="px-6 pt-8 pb-6 text-center"
