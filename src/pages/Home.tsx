@@ -429,8 +429,8 @@ export default function HomePage() {
                   </Button>
 
                   <p className="text-center text-xs text-muted-foreground">
-                    Already a registered admin?{' '}
-                    <Link to="/admin" className="text-primary font-medium hover:underline">Sign in here</Link>
+                    Already a registered Member?{' '}
+                    <Link to="/login" className="text-primary font-medium hover:underline">Sign in here</Link>
                   </p>
                 </form>
               )}
