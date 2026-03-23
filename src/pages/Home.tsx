@@ -469,6 +469,14 @@ export default function HomePage() {
               <Link to="/about" className="hover:text-primary transition-colors">About Us</Link>
               <Link to="/about" className="hover:text-primary transition-colors">Contact</Link>
               <span>© {new Date().getFullYear()} · Built with love ✝️</span>
+              <Link
+                to="/admin"
+                className="opacity-10 hover:opacity-30 transition-opacity duration-300 text-muted-foreground text-xs select-none"
+                tabIndex={-1}
+                aria-hidden="true"
+              >
+                ·
+              </Link>
             </div>
           </div>
         </div>
