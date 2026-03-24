@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,8 +8,7 @@ import { Cross, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 
 export default function LoginPage() {
-  const { user, loading: authLoading } = useAuth();
-  const { signIn } = useAuth();
+  const { user, loading: authLoading, signIn } = useAuth();
   const { toast } = useToast();
 
   const [email, setEmail] = useState('');
@@ -23,24 +21,9 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name: fullName } },
-      });
-      if (error) {
-        toast({ title: 'Sign up failed', description: error.message, variant: 'destructive' });
-      } else {
-        toast({ title: 'Account created!', description: 'You can now sign in.' });
-        setIsSignUp(false);
-      }
-    } else {
-      const { error } = await signIn(email, password);
-      if (error) {
-        toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
-      }
+    const { error } = await signIn(email, password);
+    if (error) {
+      toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
     }
     setLoading(false);
   };
@@ -85,35 +68,17 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-display font-bold text-foreground mb-2">
-              {isSignUp ? 'Create Account' : 'Welcome back'}
-            </h1>
-            <p className="text-muted-foreground">
-              {isSignUp ? 'Set up your admin account' : 'Sign in to your dashboard'}
-            </p>
+            <h1 className="text-3xl font-display font-bold text-foreground mb-2">Welcome back</h1>
+            <p className="text-muted-foreground">Sign in to your dashboard</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {isSignUp && (
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="Your full name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required={isSignUp}
-                />
-              </div>
-            )}
-
             <div className="space-y-2">
               <Label htmlFor="email">Email address</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="leader@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -143,18 +108,12 @@ export default function LoginPage() {
 
             <Button type="submit" className="w-full h-11" disabled={loading}>
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {isSignUp ? 'Create Account' : 'Sign In'}
+              Sign In
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-primary font-medium hover:underline"
-            >
-              {isSignUp ? 'Sign in' : 'Sign up'}
-            </button>
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            Access is by invitation only. Contact your administrator if you need access.
           </p>
         </div>
       </div>
