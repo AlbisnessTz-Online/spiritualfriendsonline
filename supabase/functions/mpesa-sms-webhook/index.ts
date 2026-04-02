@@ -21,9 +21,18 @@ function parseMpesaSms(text: string): {
     return null;
   }
 
-  // Transaction ID: letters followed by digits e.g. QAZ1234567, SIK1234567
-  const txIdMatch = text.match(/\b([A-Z]{2,4}\d{7,10})\b/);
-  if (!txIdMatch) return null;
+  // Transaction ID: 8-12 alphanumeric chars, must contain both letters and digits
+  const txIdCandidates = text.match(/\b([A-Z0-9]{8,12})\b/g);
+  let txId: string | null = null;
+  if (txIdCandidates) {
+    for (const candidate of txIdCandidates) {
+      if (/[A-Z]/.test(candidate) && /[0-9]/.test(candidate)) {
+        txId = candidate;
+        break;
+      }
+    }
+  }
+  if (!txId) return null;
 
   // Amount: Tanzania M-Pesa uses TSh, but also accept KES/Tsh variants
   const amountMatch = text.match(/(?:TSh|KES|Tsh)\s*([\d,]+(?:\.\d{2})?)/i);
@@ -46,7 +55,6 @@ function parseMpesaSms(text: string): {
 
   const phone = phoneMatch ? phoneMatch[1] : 'Unknown';
   const name = nameMatch ? nameMatch[1].trim() : phone;
-  const txId = txIdMatch[1];
 
   let transaction_date = new Date().toISOString().split('T')[0];
   if (dateMatch) {
@@ -74,57 +82,50 @@ function parseMpesaSms(text: string): {
 
 /**
  * Robustly extract SMS text from any request format.
- * SMS forwarder apps send many different formats — handle them all.
  */
 async function extractSmsText(req: Request): Promise<string> {
   const contentType = req.headers.get('content-type') || '';
-
-  // Clone so we can read body multiple times if needed
   const rawText = await req.text();
 
   if (!rawText || rawText.trim() === '') return '';
 
-  // 1. Try JSON first (works for application/json and some apps without proper content-type)
+  // 1. Try JSON
   try {
     const body = JSON.parse(rawText);
+    // Handle nested objects from some forwarder apps
+    const source = body.payload || body.data || body;
     const smsText =
-      body.message ||
-      body.sms ||
-      body.body ||
-      body.text ||
-      body.content ||
-      body.msg ||
-      body.Message ||
-      body.SMS ||
-      body.Body ||
+      source.message || source.sms || source.body || source.text ||
+      source.content || source.msg || source.smsText || source.sms_body ||
+      source.sms_message || source.fullSms || source.sms_text ||
+      source.Message || source.SMS || source.Body ||
+      body.message || body.sms || body.body || body.text ||
+      body.content || body.msg || body.smsText || body.sms_body ||
+      body.sms_message || body.fullSms || body.sms_text ||
+      body.Message || body.SMS || body.Body ||
       '';
     if (smsText) return String(smsText);
   } catch {
-    // Not JSON, continue
+    // Not JSON
   }
 
   // 2. Try URL-encoded form data
   if (contentType.includes('application/x-www-form-urlencoded') || rawText.includes('=')) {
     try {
       const params = new URLSearchParams(rawText);
-      const smsText =
-        params.get('message') ||
-        params.get('sms') ||
-        params.get('body') ||
-        params.get('text') ||
-        params.get('content') ||
-        params.get('msg') ||
-        params.get('Message') ||
-        params.get('SMS') ||
-        params.get('Body') ||
-        '';
-      if (smsText) return smsText;
+      const keys = ['message', 'sms', 'body', 'text', 'content', 'msg',
+        'smsText', 'sms_body', 'sms_message', 'fullSms', 'sms_text',
+        'Message', 'SMS', 'Body'];
+      for (const key of keys) {
+        const val = params.get(key);
+        if (val) return val;
+      }
     } catch {
-      // Not URL-encoded, continue
+      // Not URL-encoded
     }
   }
 
-  // 3. Treat the raw body itself as the SMS text (some apps POST raw text)
+  // 3. Raw text
   return rawText.trim();
 }
 
@@ -133,14 +134,14 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(supabaseUrl, serviceKey);
+
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const webhookToken = Deno.env.get('SMS_WEBHOOK_TOKEN');
 
-    const supabase = createClient(supabaseUrl, serviceKey);
-
-    // Optional: verify webhook token for security
+    // Optional: verify webhook token
     if (webhookToken) {
       const incomingToken =
         req.headers.get('x-sms-forwarder-token') ||
@@ -156,6 +157,7 @@ serve(async (req) => {
     const smsText = await extractSmsText(req);
 
     if (!smsText) {
+      await logSms(supabase, '', false, 'Empty SMS body');
       return new Response(JSON.stringify({ error: 'No SMS text provided' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -167,6 +169,7 @@ serve(async (req) => {
     const parsed = parseMpesaSms(smsText);
 
     if (!parsed) {
+      await logSms(supabase, smsText, false, 'Not a recognized M-Pesa transaction');
       return new Response(JSON.stringify({
         success: false,
         message: 'SMS is not a recognized M-Pesa transaction',
@@ -177,7 +180,7 @@ serve(async (req) => {
       });
     }
 
-    // Upsert to transactions (avoid duplicates by transaction_id)
+    // Upsert to transactions
     const { data, error } = await supabase
       .from('transactions')
       .upsert({
@@ -194,12 +197,14 @@ serve(async (req) => {
 
     if (error) {
       console.error('DB insert error:', error);
+      await logSms(supabase, smsText, false, `DB error: ${error.message}`);
       return new Response(JSON.stringify({ success: false, error: error.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
+    await logSms(supabase, smsText, true, null);
     console.log('Transaction saved:', parsed.transaction_id, parsed.amount);
 
     return new Response(JSON.stringify({
@@ -219,9 +224,22 @@ serve(async (req) => {
     });
   } catch (err) {
     console.error('Webhook error:', err);
+    await logSms(supabase, '', false, `Exception: ${String(err)}`).catch(() => {});
     return new Response(JSON.stringify({ success: false, error: String(err) }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });
+
+async function logSms(supabase: any, rawBody: string, parsedOk: boolean, errorReason: string | null) {
+  try {
+    await supabase.from('sms_logs').insert({
+      raw_body: rawBody.slice(0, 2000),
+      parsed_ok: parsedOk,
+      error_reason: errorReason,
+    });
+  } catch (e) {
+    console.error('Failed to log SMS:', e);
+  }
+}
