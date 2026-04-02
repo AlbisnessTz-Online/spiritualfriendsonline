@@ -179,6 +179,30 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_logs: {
+        Row: {
+          created_at: string
+          error_reason: string | null
+          id: string
+          parsed_ok: boolean
+          raw_body: string
+        }
+        Insert: {
+          created_at?: string
+          error_reason?: string | null
+          id?: string
+          parsed_ok?: boolean
+          raw_body: string
+        }
+        Update: {
+          created_at?: string
+          error_reason?: string | null
+          id?: string
+          parsed_ok?: boolean
+          raw_body?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
