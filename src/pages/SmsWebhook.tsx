@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Copy, CheckCheck, Smartphone, Wifi, AlertCircle, ExternalLink, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
 const SUPABASE_PROJECT_ID = import.meta.env.VITE_SUPABASE_URL?.split('//')[1]?.split('.')[0] ?? '';
@@ -18,11 +16,21 @@ interface RecentTx {
   created_at: string;
 }
 
+interface SmsLog {
+  id: string;
+  raw_body: string;
+  parsed_ok: boolean;
+  error_reason: string | null;
+  created_at: string;
+}
+
 export default function SmsWebhookPage() {
   const { toast } = useToast();
   const [copied, setCopied] = useState<string | null>(null);
   const [recentTx, setRecentTx] = useState<RecentTx[]>([]);
+  const [recentLogs, setRecentLogs] = useState<SmsLog[]>([]);
   const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
   const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -31,19 +39,44 @@ export default function SmsWebhookPage() {
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const fetchRecent = async () => {
+  const fetchRecent = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from('transactions')
-      .select('id, transaction_id, member_name, amount, transaction_date, created_at')
-      .eq('source', 'sms_import')
-      .order('created_at', { ascending: false })
-      .limit(10);
-    setRecentTx(data || []);
-    setLoading(false);
-  };
+    const [transactionsRes, logsRes] = await Promise.all([
+      supabase
+        .from('transactions')
+        .select('id, transaction_id, member_name, amount, transaction_date, created_at')
+        .eq('source', 'sms_import')
+        .order('created_at', { ascending: false })
+        .limit(10),
+      supabase
+        .from('sms_logs')
+        .select('id, raw_body, parsed_ok, error_reason, created_at')
+        .order('created_at', { ascending: false })
+        .limit(10),
+    ]);
 
-  useEffect(() => { fetchRecent(); }, []);
+    if (transactionsRes.error) {
+      toast({ title: 'Failed to load transactions', description: transactionsRes.error.message, variant: 'destructive' });
+    }
+
+    if (logsRes.error) {
+      toast({ title: 'Failed to load SMS activity', description: logsRes.error.message, variant: 'destructive' });
+    }
+
+    setRecentTx(transactionsRes.data || []);
+    setRecentLogs(logsRes.data || []);
+    setLastUpdated(new Date().toLocaleTimeString());
+    setLoading(false);
+  }, [toast]);
+
+  useEffect(() => {
+    fetchRecent();
+    const interval = window.setInterval(() => {
+      fetchRecent();
+    }, 5000);
+
+    return () => window.clearInterval(interval);
+  }, [fetchRecent]);
 
   const CopyButton = ({ text, copyKey }: { text: string; copyKey: string }) => (
     <button
@@ -101,8 +134,9 @@ export default function SmsWebhookPage() {
           <div className="flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
             <div className="text-xs text-foreground/80 space-y-1">
-              <p><strong>Request format:</strong> POST with JSON body containing <code className="bg-muted px-1 rounded">message</code> field with the SMS text</p>
+              <p><strong>Request format:</strong> POST with JSON or form-data containing the SMS text in fields like <code className="bg-muted px-1 rounded">message</code>, <code className="bg-muted px-1 rounded">smsText</code>, <code className="bg-muted px-1 rounded">body</code>, or <code className="bg-muted px-1 rounded">text</code></p>
               <p><strong>Content-Type:</strong> <code className="bg-muted px-1 rounded">application/json</code> or <code className="bg-muted px-1 rounded">application/x-www-form-urlencoded</code></p>
+              <p><strong>Best for testing:</strong> temporarily disable sender filtering or include both <code className="bg-muted px-1 rounded">MPESA</code> and <code className="bg-muted px-1 rounded">M-KOBA</code> so no real SMS is skipped</p>
             </div>
           </div>
         </div>
@@ -147,9 +181,9 @@ export default function SmsWebhookPage() {
 
         <div className="mt-4 p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground space-y-1">
           <p><strong>App configuration tips:</strong></p>
-          <p>• Set sender filter to: <code className="bg-muted px-1 rounded">MPESA</code> or <code className="bg-muted px-1 rounded">M-PESA</code></p>
+          <p>• For verification, first turn sender filtering off or include both <code className="bg-muted px-1 rounded">MPESA</code> and <code className="bg-muted px-1 rounded">M-KOBA</code></p>
           <p>• Set method to: <code className="bg-muted px-1 rounded">POST</code></p>
-          <p>• Set body field name to: <code className="bg-muted px-1 rounded">message</code></p>
+          <p>• Use a body field name like: <code className="bg-muted px-1 rounded">message</code>, <code className="bg-muted px-1 rounded">smsText</code>, or <code className="bg-muted px-1 rounded">body</code></p>
           <p>• Paste the webhook URL above as the destination</p>
         </div>
       </div>
@@ -157,7 +191,10 @@ export default function SmsWebhookPage() {
       {/* Recent auto-imported transactions */}
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h2 className="font-display font-semibold text-foreground">Recently Auto-Imported</h2>
+          <div>
+            <h2 className="font-display font-semibold text-foreground">Recently Auto-Imported</h2>
+            <p className="text-xs text-muted-foreground mt-1">Auto-refreshes every 5 seconds{lastUpdated ? ` · Last checked ${lastUpdated}` : ''}</p>
+          </div>
           <Button variant="ghost" size="sm" onClick={fetchRecent} className="gap-1.5">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </Button>
@@ -175,6 +212,37 @@ export default function SmsWebhookPage() {
                   <p className="text-xs text-muted-foreground">{tx.transaction_id} · {tx.transaction_date}</p>
                 </div>
                 <span className="text-secondary font-semibold">TSh {Number(tx.amount).toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h2 className="font-display font-semibold text-foreground">Incoming SMS Activity</h2>
+          <p className="text-xs text-muted-foreground mt-1">Every SMS that reaches the webhook appears here, even when parsing fails.</p>
+        </div>
+        {recentLogs.length === 0 ? (
+          <div className="py-10 text-center text-muted-foreground text-sm px-5">
+            No SMS has reached the webhook yet. If your phone says “sent” but nothing appears here, the forwarder is not hitting this exact URL or is being filtered before sending.
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {recentLogs.map((log) => (
+              <div key={log.id} className="px-5 py-4 space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${log.parsed_ok ? 'bg-secondary/10 text-secondary' : 'bg-destructive/10 text-destructive'}`}>
+                      {log.parsed_ok ? 'Parsed OK' : 'Failed to parse'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{new Date(log.created_at).toLocaleString()}</span>
+                  </div>
+                </div>
+                <p className="text-sm text-foreground break-words leading-relaxed">{log.raw_body}</p>
+                {!log.parsed_ok && log.error_reason && (
+                  <p className="text-xs text-destructive">Reason: {log.error_reason}</p>
+                )}
               </div>
             ))}
           </div>

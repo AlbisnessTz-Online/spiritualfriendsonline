@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Search, Trash2, Loader2, X, Filter } from 'lucide-react';
@@ -36,22 +36,35 @@ export default function TransactionsPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
-  const fetchTransactions = async () => {
-    setLoading(true);
+  const fetchTransactions = useCallback(async (background = false) => {
+    if (background) setRefreshing(true);
+    else setLoading(true);
+
     let query = supabase.from('transactions').select('*').order('transaction_date', { ascending: false });
     if (dateFrom) query = query.gte('transaction_date', dateFrom);
     if (dateTo) query = query.lte('transaction_date', dateTo);
     const { data, error } = await query;
     if (!error) setTransactions(data || []);
-    setLoading(false);
-  };
+    setLastUpdated(new Date().toLocaleTimeString());
+    if (background) setRefreshing(false);
+    else setLoading(false);
+  }, [dateFrom, dateTo]);
 
-  useEffect(() => { fetchTransactions(); }, [dateFrom, dateTo]);
+  useEffect(() => {
+    fetchTransactions();
+    const interval = window.setInterval(() => {
+      fetchTransactions(true);
+    }, 5000);
+
+    return () => window.clearInterval(interval);
+  }, [fetchTransactions]);
 
   const handleSave = async () => {
     if (!form.member_name || !form.phone_number || !form.amount || !form.transaction_id) {
@@ -91,10 +104,14 @@ export default function TransactionsPage() {
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Transactions</h1>
           <p className="text-muted-foreground text-sm mt-1">{filtered.length} transaction{filtered.length !== 1 ? 's' : ''} · Total: <span className="font-semibold text-secondary">TSh {total.toLocaleString()}</span></p>
+          <p className="text-xs text-muted-foreground mt-1">Live refresh every 5 seconds{lastUpdated ? ` · Last checked ${lastUpdated}` : ''}</p>
         </div>
-        <Button onClick={() => { setForm(emptyForm); setDialogOpen(true); }} className="gap-2">
-          <Plus className="w-4 h-4" /> Add Transaction
-        </Button>
+        <div className="flex items-center gap-2">
+          {refreshing && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+          <Button onClick={() => { setForm(emptyForm); setDialogOpen(true); }} className="gap-2">
+            <Plus className="w-4 h-4" /> Add Transaction
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
