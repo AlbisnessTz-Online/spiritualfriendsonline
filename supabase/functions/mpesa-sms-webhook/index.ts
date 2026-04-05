@@ -6,6 +6,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-sms-forwarder-token',
 };
 
+function buildFallbackTransactionId(text: string): string {
+  let hash = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    hash = ((hash << 5) - hash + text.charCodeAt(index)) | 0;
+  }
+
+  const normalized = Math.abs(hash).toString(36).toUpperCase().padStart(8, '0');
+  return `SMS${normalized.slice(0, 9)}`;
+}
+
 // Parses M-Pesa and M-KOBA SMS text
 function parseMpesaSms(text: string): {
   transaction_id: string;
@@ -16,8 +26,10 @@ function parseMpesaSms(text: string): {
 } | null {
   const upper = text.toUpperCase();
 
-  // Must be an M-Pesa related message
-  if (!upper.includes('MPESA') && !upper.includes('M-PESA') && !upper.includes('CONFIRMED') && !upper.includes('RECEIVED') && !upper.includes('M-KOBA')) {
+  const isContributionSms = upper.includes('HAS CONTRIBUTED') && upper.includes('GROUP');
+
+  // Must be an M-Pesa related message or a group contribution message
+  if (!isContributionSms && !upper.includes('MPESA') && !upper.includes('M-PESA') && !upper.includes('CONFIRMED') && !upper.includes('RECEIVED') && !upper.includes('M-KOBA')) {
     return null;
   }
 
@@ -32,19 +44,26 @@ function parseMpesaSms(text: string): {
       }
     }
   }
+  if (!txId && isContributionSms) {
+    txId = buildFallbackTransactionId(text);
+  }
   if (!txId) return null;
 
-  // Amount: Tanzania M-Pesa uses TSh, but also accept KES/Tsh variants
-  const amountMatch = text.match(/(?:TSh|KES|Tsh)\s*([\d,]+(?:\.\d{2})?)/i);
+  // Amount: Tanzania messages may use TSh, KES, or TZS with punctuation
+  const amountMatch =
+    text.match(/(?:TSh|KES|TZS)\s*[.:]?\s*([\d,]+(?:\.\d{2})?)/i) ||
+    text.match(/(?:received|sent|paid|contributed)\s+(?:TSh|KES|TZS)?\s*[.:]?\s*([\d,]+(?:\.\d{2})?)/i);
   if (!amountMatch) return null;
 
   // Tanzania phone numbers: 07xx, 06xx, 2557xx, +2557xx
-  const phoneMatch = text.match(/(07\d{8}|06\d{8}|2557\d{8}|\+2557\d{8})/);
+  const phoneMatch = text.match(/(07\d{8}|06\d{8}|255\d{9}|\+255\d{9})/);
 
   // Name: between "from" or "received from" and phone/on
   const nameMatch =
+    text.match(/([A-Z][A-Z\s]{2,60}?)\s*\((?:\+?255\d{9}|0\d{9})\)/i) ||
     text.match(/(?:from|received from|RECEIVED FROM|kutoka kwa)\s+([A-Z][A-Z\s]{2,40}?)(?:\s+\d|\s+on|\s+07|\s+06|\s+255)/i) ||
-    text.match(/(?:sent to|kwenda kwa)\s+([A-Z][A-Z\s]{2,40}?)(?:\s+\d|\s+on|\s+07|\s+06|\s+255)/i);
+    text.match(/(?:sent to|kwenda kwa)\s+([A-Z][A-Z\s]{2,40}?)(?:\s+\d|\s+on|\s+07|\s+06|\s+255)/i) ||
+    text.match(/([A-Z][A-Z\s]{2,60}?)\s+has contributed/i);
 
   // Date: format d/m/yy or d/m/yyyy or dd/mm/yy
   const dateMatch = text.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);
