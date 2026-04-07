@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Search, Trash2, Loader2, X, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,37 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+
+const labels = {
+  en: {
+    title: 'Transactions', transaction: 'transaction', transactions: 'transactions',
+    total: 'Total', liveRefresh: 'Live refresh every 5 seconds', lastChecked: 'Last checked',
+    addTx: 'Add Transaction', searchPlaceholder: 'Search by name, phone, or transaction ID...',
+    noTx: 'No transactions found.', addFirst: 'Add first transaction',
+    memberName: 'Member Name', phone: 'Phone', amount: 'Amount (TSh)',
+    txId: 'Transaction ID', date: 'Date', source: 'Source',
+    fullName: 'Full name', notes: 'Notes (optional)', monthlyContrib: 'Monthly contribution...',
+    cancel: 'Cancel', save: 'Save', deleteTx: 'Delete Transaction?',
+    deleteDesc: 'This cannot be undone.', delete: 'Delete',
+    smsImport: 'SMS Import', manual: 'Manual',
+    txAdded: 'Transaction added', txDeleted: 'Transaction deleted',
+    validationError: 'Validation error', requiredMissing: 'Required fields are missing.',
+  },
+  sw: {
+    title: 'Miamala', transaction: 'muamala', transactions: 'miamala',
+    total: 'Jumla', liveRefresh: 'Upya otomatiki kila sekunde 5', lastChecked: 'Mara ya mwisho',
+    addTx: 'Ongeza Muamala', searchPlaceholder: 'Tafuta kwa jina, simu, au kitambulisho...',
+    noTx: 'Hakuna miamala.', addFirst: 'Ongeza muamala wa kwanza',
+    memberName: 'Jina la Mwanachama', phone: 'Simu', amount: 'Kiasi (TSh)',
+    txId: 'Kitambulisho cha Muamala', date: 'Tarehe', source: 'Chanzo',
+    fullName: 'Jina kamili', notes: 'Maelezo (si lazima)', monthlyContrib: 'Mchango wa kila mwezi...',
+    cancel: 'Ghairi', save: 'Hifadhi', deleteTx: 'Futa Muamala?',
+    deleteDesc: 'Hatua hii haiwezi kutendwa tena.', delete: 'Futa',
+    smsImport: 'Ingizo la SMS', manual: 'Mkono',
+    txAdded: 'Muamala umeongezwa', txDeleted: 'Muamala umefutwa',
+    validationError: 'Hitilafu ya uthibitishaji', requiredMissing: 'Sehemu zinazohitajika hazipo.',
+  },
+} as const;
 
 interface Transaction {
   id: string;
@@ -31,6 +63,8 @@ const emptyForm = {
 
 export default function TransactionsPage() {
   const { toast } = useToast();
+  const { lang } = useAppTheme();
+  const t = labels[lang];
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [search, setSearch] = useState('');
   const [dateFrom, setDateFrom] = useState('');
@@ -62,13 +96,12 @@ export default function TransactionsPage() {
     const interval = window.setInterval(() => {
       fetchTransactions(true);
     }, 5000);
-
     return () => window.clearInterval(interval);
   }, [fetchTransactions]);
 
   const handleSave = async () => {
     if (!form.member_name || !form.phone_number || !form.amount || !form.transaction_id) {
-      toast({ title: 'Validation error', description: 'Required fields are missing.', variant: 'destructive' });
+      toast({ title: t.validationError, description: t.requiredMissing, variant: 'destructive' });
       return;
     }
     setSaving(true);
@@ -78,7 +111,7 @@ export default function TransactionsPage() {
       transaction_date: form.transaction_date, notes: form.notes || null,
     });
     if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    else { toast({ title: 'Transaction added' }); setDialogOpen(false); fetchTransactions(); }
+    else { toast({ title: t.txAdded }); setDialogOpen(false); fetchTransactions(); }
     setSaving(false);
   };
 
@@ -86,65 +119,63 @@ export default function TransactionsPage() {
     if (!deleteId) return;
     const { error } = await supabase.from('transactions').delete().eq('id', deleteId);
     if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    else { toast({ title: 'Transaction deleted' }); fetchTransactions(); }
+    else { toast({ title: t.txDeleted }); fetchTransactions(); }
     setDeleteId(null);
   };
 
   const filtered = transactions.filter(
-    (t) => t.member_name.toLowerCase().includes(search.toLowerCase()) ||
-      t.transaction_id.toLowerCase().includes(search.toLowerCase()) ||
-      t.phone_number.includes(search)
+    (tx) => tx.member_name.toLowerCase().includes(search.toLowerCase()) ||
+      tx.transaction_id.toLowerCase().includes(search.toLowerCase()) ||
+      tx.phone_number.includes(search)
   );
 
-  const total = filtered.reduce((s, t) => s + Number(t.amount), 0);
+  const total = filtered.reduce((s, tx) => s + Number(tx.amount), 0);
 
   return (
     <div className="space-y-6 max-w-6xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Transactions</h1>
-          <p className="text-muted-foreground text-sm mt-1">{filtered.length} transaction{filtered.length !== 1 ? 's' : ''} · Total: <span className="font-semibold text-secondary">TSh {total.toLocaleString()}</span></p>
-          <p className="text-xs text-muted-foreground mt-1">Live refresh every 5 seconds{lastUpdated ? ` · Last checked ${lastUpdated}` : ''}</p>
+          <h1 className="text-2xl font-display font-bold text-foreground">{t.title}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{filtered.length} {filtered.length !== 1 ? t.transactions : t.transaction} · {t.total}: <span className="font-semibold text-secondary">TSh {total.toLocaleString()}</span></p>
+          <p className="text-xs text-muted-foreground mt-1">{t.liveRefresh}{lastUpdated ? ` · ${t.lastChecked} ${lastUpdated}` : ''}</p>
         </div>
         <div className="flex items-center gap-2">
           {refreshing && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
           <Button onClick={() => { setForm(emptyForm); setDialogOpen(true); }} className="gap-2">
-            <Plus className="w-4 h-4" /> Add Transaction
+            <Plus className="w-4 h-4" /> {t.addTx}
           </Button>
         </div>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input className="pl-9" placeholder="Search by name, phone, or transaction ID..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input className="pl-9" placeholder={t.searchPlaceholder} value={search} onChange={(e) => setSearch(e.target.value)} />
           {search && <button className="absolute right-3 top-1/2 -translate-y-1/2" onClick={() => setSearch('')}><X className="w-4 h-4 text-muted-foreground" /></button>}
         </div>
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-          <Input type="date" className="w-36" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} placeholder="From" />
+          <Input type="date" className="w-36" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
           <span className="text-muted-foreground text-sm">–</span>
-          <Input type="date" className="w-36" value={dateTo} onChange={(e) => setDateTo(e.target.value)} placeholder="To" />
+          <Input type="date" className="w-36" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
           {(dateFrom || dateTo) && <button onClick={() => { setDateFrom(''); setDateTo(''); }}><X className="w-4 h-4 text-muted-foreground hover:text-foreground" /></button>}
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
         {loading ? (
           <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center">
-            <p className="text-muted-foreground">No transactions found.</p>
-            <Button variant="outline" className="mt-4" onClick={() => { setForm(emptyForm); setDialogOpen(true); }}>Add first transaction</Button>
+            <p className="text-muted-foreground">{t.noTx}</p>
+            <Button variant="outline" className="mt-4" onClick={() => { setForm(emptyForm); setDialogOpen(true); }}>{t.addFirst}</Button>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
-                  {['Member Name', 'Phone', 'Amount (TSh)', 'Transaction ID', 'Date', 'Source', ''].map((h) => (
+                  {[t.memberName, t.phone, t.amount, t.txId, t.date, t.source, ''].map((h) => (
                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{h}</th>
                   ))}
                 </tr>
@@ -159,7 +190,7 @@ export default function TransactionsPage() {
                     <td className="px-5 py-3.5 text-muted-foreground text-sm">{tx.transaction_date}</td>
                     <td className="px-5 py-3.5">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${tx.source === 'sms_import' ? 'bg-accent/15 text-accent-foreground' : 'bg-muted text-muted-foreground'}`}>
-                        {tx.source === 'sms_import' ? 'SMS Import' : 'Manual'}
+                        {tx.source === 'sms_import' ? t.smsImport : t.manual}
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
@@ -175,44 +206,43 @@ export default function TransactionsPage() {
         )}
       </div>
 
-      {/* Add Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add Transaction</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t.addTx}</DialogTitle></DialogHeader>
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Member Name</Label>
-                <Input value={form.member_name} onChange={(e) => setForm({ ...form, member_name: e.target.value })} placeholder="Full name" />
+                <Label>{t.memberName}</Label>
+                <Input value={form.member_name} onChange={(e) => setForm({ ...form, member_name: e.target.value })} placeholder={t.fullName} />
               </div>
               <div className="space-y-2">
-                <Label>Phone Number</Label>
+                <Label>{t.phone}</Label>
                 <Input value={form.phone_number} onChange={(e) => setForm({ ...form, phone_number: e.target.value })} placeholder="07XXXXXXXX" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Amount (TSh)</Label>
+                <Label>{t.amount}</Label>
                 <Input type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="500" />
               </div>
               <div className="space-y-2">
-                <Label>Transaction ID</Label>
+                <Label>{t.txId}</Label>
                 <Input value={form.transaction_id} onChange={(e) => setForm({ ...form, transaction_id: e.target.value })} placeholder="QAZ1234567" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Date</Label>
+              <Label>{t.date}</Label>
               <Input type="date" value={form.transaction_date} onChange={(e) => setForm({ ...form, transaction_date: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label>Notes (optional)</Label>
-              <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Monthly contribution..." />
+              <Label>{t.notes}</Label>
+              <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder={t.monthlyContrib} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>{t.cancel}</Button>
             <Button onClick={handleSave} disabled={saving}>
-              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Save
+              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}{t.save}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -221,12 +251,12 @@ export default function TransactionsPage() {
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Transaction?</AlertDialogTitle>
-            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle>{t.deleteTx}</AlertDialogTitle>
+            <AlertDialogDescription>{t.deleteDesc}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{t.delete}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
