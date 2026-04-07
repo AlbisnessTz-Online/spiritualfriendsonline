@@ -1,8 +1,48 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { Copy, CheckCheck, Smartphone, Wifi, AlertCircle, ExternalLink, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+
+const labels = {
+  en: {
+    title: 'Auto SMS Import', subtitle: 'Connect your Android phone to automatically send M-Pesa transactions to this system',
+    howItWorks: 'How it works',
+    step1: 'Install an SMS forwarder app on the Android phone that receives M-Pesa SMS messages',
+    step2: 'Configure the app to forward SMS from "MPESA" sender to this webhook URL',
+    step3: 'Every M-KOBA/M-Pesa contribution SMS will be automatically parsed and saved to transactions',
+    webhookUrl: 'Your Webhook URL', copyUrl: 'Copy this URL and paste it into your SMS forwarder app as the forwarding destination:',
+    copied: 'Copied to clipboard!',
+    requestFormat: 'Request format:', contentType: 'Content-Type:', bestForTesting: 'Best for testing:',
+    recommendedApps: 'Recommended SMS Forwarder Apps', appConfigTips: 'App configuration tips:',
+    recentlyImported: 'Recently Auto-Imported', autoRefresh: 'Auto-refreshes every 5 seconds',
+    lastChecked: 'Last checked', refresh: 'Refresh',
+    noAutoImported: 'No auto-imported transactions yet. Once your phone forwards an M-Pesa SMS, it will appear here.',
+    incomingSmsActivity: 'Incoming SMS Activity',
+    incomingSmsDesc: 'Every SMS that reaches the webhook appears here, even when parsing fails.',
+    noSmsReceived: 'No SMS has reached the webhook yet. If your phone says "sent" but nothing appears here, the forwarder is not hitting this exact URL or is being filtered before sending.',
+    parsedOk: 'Parsed OK', failedParse: 'Failed to parse', reason: 'Reason',
+  },
+  sw: {
+    title: 'Ingiza SMS Otomatiki', subtitle: 'Unganisha simu yako ya Android kutuma miamala ya M-Pesa kiautomatiki kwenye mfumo huu',
+    howItWorks: 'Jinsi inavyofanya kazi',
+    step1: 'Sakinisha programu ya kusambaza SMS kwenye simu ya Android inayopokea ujumbe wa M-Pesa',
+    step2: 'Sanidi programu kusambaza SMS kutoka "MPESA" hadi URL hii ya webhook',
+    step3: 'Kila SMS ya mchango wa M-KOBA/M-Pesa itachambuliwa na kuhifadhiwa kwenye miamala kiautomatiki',
+    webhookUrl: 'URL Yako ya Webhook', copyUrl: 'Nakili URL hii na uibandike kwenye programu yako ya kusambaza SMS:',
+    copied: 'Imenakiliwa!',
+    requestFormat: 'Umbizo la ombi:', contentType: 'Aina ya Maudhui:', bestForTesting: 'Bora kwa majaribio:',
+    recommendedApps: 'Programu Zinazopendekezwa za Kusambaza SMS', appConfigTips: 'Vidokezo vya usanidi:',
+    recentlyImported: 'Zilizoingizwa Hivi Karibuni', autoRefresh: 'Upya otomatiki kila sekunde 5',
+    lastChecked: 'Mara ya mwisho', refresh: 'Sasisha',
+    noAutoImported: 'Hakuna miamala iliyoingizwa kiautomatiki bado. Simu yako ikisambaza SMS ya M-Pesa, itaonekana hapa.',
+    incomingSmsActivity: 'Shughuli za SMS Zinazoingia',
+    incomingSmsDesc: 'Kila SMS inayofika kwenye webhook inaonekana hapa, hata uchambuzi ukishindikana.',
+    noSmsReceived: 'Hakuna SMS iliyofika kwenye webhook bado. Ikiwa simu yako inasema "imetumwa" lakini hakuna kinachoonekana hapa, msambazaji haupigi URL hii.',
+    parsedOk: 'Imechambuliwa', failedParse: 'Uchambuzi umeshindikana', reason: 'Sababu',
+  },
+} as const;
 
 const SUPABASE_PROJECT_ID = import.meta.env.VITE_SUPABASE_URL?.split('//')[1]?.split('.')[0] ?? '';
 const WEBHOOK_URL = `https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/mpesa-sms-webhook`;

@@ -1,7 +1,39 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Search, Trash2, Loader2, X, Filter } from 'lucide-react';
+
+const labels = {
+  en: {
+    title: 'Transactions', transaction: 'transaction', transactions: 'transactions',
+    total: 'Total', liveRefresh: 'Live refresh every 5 seconds', lastChecked: 'Last checked',
+    addTx: 'Add Transaction', searchPlaceholder: 'Search by name, phone, or transaction ID...',
+    noTx: 'No transactions found.', addFirst: 'Add first transaction',
+    memberName: 'Member Name', phone: 'Phone', amount: 'Amount (TSh)',
+    txId: 'Transaction ID', date: 'Date', source: 'Source',
+    fullName: 'Full name', notes: 'Notes (optional)', monthlyContrib: 'Monthly contribution...',
+    cancel: 'Cancel', save: 'Save', deleteTx: 'Delete Transaction?',
+    deleteDesc: 'This cannot be undone.', delete: 'Delete',
+    smsImport: 'SMS Import', manual: 'Manual',
+    txAdded: 'Transaction added', txDeleted: 'Transaction deleted',
+    validationError: 'Validation error', requiredMissing: 'Required fields are missing.',
+  },
+  sw: {
+    title: 'Miamala', transaction: 'muamala', transactions: 'miamala',
+    total: 'Jumla', liveRefresh: 'Upya otomatiki kila sekunde 5', lastChecked: 'Mara ya mwisho',
+    addTx: 'Ongeza Muamala', searchPlaceholder: 'Tafuta kwa jina, simu, au kitambulisho...',
+    noTx: 'Hakuna miamala.', addFirst: 'Ongeza muamala wa kwanza',
+    memberName: 'Jina la Mwanachama', phone: 'Simu', amount: 'Kiasi (TSh)',
+    txId: 'Kitambulisho cha Muamala', date: 'Tarehe', source: 'Chanzo',
+    fullName: 'Jina kamili', notes: 'Maelezo (si lazima)', monthlyContrib: 'Mchango wa kila mwezi...',
+    cancel: 'Ghairi', save: 'Hifadhi', deleteTx: 'Futa Muamala?',
+    deleteDesc: 'Hatua hii haiwezi kutendwa tena.', delete: 'Futa',
+    smsImport: 'Ingizo la SMS', manual: 'Mkono',
+    txAdded: 'Muamala umeongezwa', txDeleted: 'Muamala umefutwa',
+    validationError: 'Hitilafu ya uthibitishaji', requiredMissing: 'Sehemu zinazohitajika hazipo.',
+  },
+} as const;
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

@@ -1,7 +1,51 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, Loader2, Crown, Shield, User, BookOpen, CheckCircle2, Clock } from 'lucide-react';
+
+const labels = {
+  en: {
+    title: 'Leaders', subtitle: 'Register group leaders and assign their roles',
+    registerLeader: 'Register Leader', active: 'Active', pendingSignup: 'Pending signup',
+    notAssigned: 'Not assigned', activeLeaders: 'Active Leaders',
+    awaitingSignup: 'Awaiting Sign-up', pending: 'Pending',
+    noLeaders: 'No leaders registered yet.', registerFirst: 'Register first leader',
+    fullName: 'Full Name', email: 'Email Address', role: 'Role',
+    howItWorks: 'How it works:', howItWorksDesc: 'Once registered, share the login page URL with this leader. When they sign up using this exact email address, they will automatically be assigned the',
+    roleAutoSuffix: 'role.',
+    cancel: 'Cancel', registerBtn: 'Register Leader',
+    removeLeader: 'Remove Leader?', removeDesc: 'This will remove their registration. If they have already signed up, their account will remain but their role may need to be reassigned.',
+    remove: 'Remove', leaderRegistered: '✓ Leader registered!',
+    leaderRemoved: 'Leader removed',
+    tip: '💡 Registered leaders must sign up at the login page using their registered email. Their role will be assigned automatically.',
+    admin: 'Admin', chairperson: 'Chairperson', treasurer: 'Mr. Treasurer',
+    secretary: 'Secretary', disciplineLeader: 'Discipline Leader',
+    adminDesc: 'Full system access', chairpersonDesc: 'Group chair & leader',
+    treasurerDesc: 'Manages finances & contributions', secretaryDesc: 'Manages records & members',
+    disciplineLeaderDesc: 'Maintains group discipline',
+  },
+  sw: {
+    title: 'Viongozi', subtitle: 'Sajili viongozi wa kikundi na uwagawie majukumu',
+    registerLeader: 'Sajili Kiongozi', active: 'Hai', pendingSignup: 'Inasubiri usajili',
+    notAssigned: 'Hajagawiwa', activeLeaders: 'Viongozi Hai',
+    awaitingSignup: 'Wanaosubiri Usajili', pending: 'Inasubiri',
+    noLeaders: 'Hakuna viongozi waliosajiliwa bado.', registerFirst: 'Sajili kiongozi wa kwanza',
+    fullName: 'Jina Kamili', email: 'Barua Pepe', role: 'Jukumu',
+    howItWorks: 'Jinsi inavyofanya kazi:', howItWorksDesc: 'Baada ya kusajili, shiriki URL ya ukurasa wa kuingia na kiongozi huyu. Atakapojisajili kwa kutumia barua pepe hii, atapewa jukumu la',
+    roleAutoSuffix: 'kiautomatiki.',
+    cancel: 'Ghairi', registerBtn: 'Sajili Kiongozi',
+    removeLeader: 'Ondoa Kiongozi?', removeDesc: 'Hii itaondoa usajili wao. Ikiwa wameshajisajili, akaunti yao itabaki lakini jukumu lao litahitaji kupewa upya.',
+    remove: 'Ondoa', leaderRegistered: '✓ Kiongozi amesajiliwa!',
+    leaderRemoved: 'Kiongozi ameondolewa',
+    tip: '💡 Viongozi waliosajiliwa lazima wajisajili kwenye ukurasa wa kuingia kwa kutumia barua pepe yao iliyosajiliwa. Jukumu lao litapewa kiautomatiki.',
+    admin: 'Msimamizi', chairperson: 'Mwenyekiti', treasurer: 'Mweka Hazina',
+    secretary: 'Katibu', disciplineLeader: 'Kiongozi wa Nidhamu',
+    adminDesc: 'Ufikiaji kamili wa mfumo', chairpersonDesc: 'Mwenyekiti & kiongozi wa kikundi',
+    treasurerDesc: 'Anasimamia fedha na michango', secretaryDesc: 'Anasimamia kumbukumbu na wanachama',
+    disciplineLeaderDesc: 'Anadumisha nidhamu ya kikundi',
+  },
+} as const;
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

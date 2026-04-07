@@ -1,7 +1,47 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit2, Trash2, Loader2, BookOpen, Star, Sparkles, Share2 } from 'lucide-react';
+
+const labels = {
+  en: {
+    title: 'Daily Prayers', subtitle: "Manage the group's daily prayer messages",
+    autoGenerate: 'Auto-Generate (KkkT)', generating: 'Generating...',
+    addPrayer: 'Add Prayer', todayActive: "Today's Active Prayer · KkkT Calendar",
+    share: 'Share', active: 'Active', noPrayers: 'No prayers yet.',
+    addFirst: 'Add first prayer', editPrayer: 'Edit Prayer',
+    prayerTitle: 'Title', titlePlaceholder: 'Prayer title...',
+    prayerDate: 'Prayer Date', prayerContent: 'Prayer Content',
+    contentPlaceholder: 'Write the prayer message here...',
+    setActive: "Set as today's active prayer",
+    cancel: 'Cancel', saveChanges: 'Save Changes',
+    deletePrayer: 'Delete Prayer?', deleteDesc: 'This action cannot be undone.',
+    delete: 'Delete', prayerUpdated: 'Prayer updated', prayerAdded: 'Prayer added',
+    prayerDeleted: 'Prayer deleted', prayerGenerated: '✨ Prayer generated!',
+    alreadySet: 'Prayer already set for today', editBelow: 'Edit it below if needed.',
+    genFailed: 'Generation failed', tryAgain: 'Try again',
+    validationError: 'Validation error', titleContentRequired: 'Title and content are required.',
+  },
+  sw: {
+    title: 'Sala za Kila Siku', subtitle: 'Simamia ujumbe wa sala za kila siku za kikundi',
+    autoGenerate: 'Tengeneza Otomatiki (KkkT)', generating: 'Inatengeneza...',
+    addPrayer: 'Ongeza Sala', todayActive: 'Sala ya Leo · Kalenda ya KkkT',
+    share: 'Shiriki', active: 'Hai', noPrayers: 'Hakuna sala bado.',
+    addFirst: 'Ongeza sala ya kwanza', editPrayer: 'Hariri Sala',
+    prayerTitle: 'Kichwa', titlePlaceholder: 'Kichwa cha sala...',
+    prayerDate: 'Tarehe ya Sala', prayerContent: 'Maudhui ya Sala',
+    contentPlaceholder: 'Andika ujumbe wa sala hapa...',
+    setActive: 'Weka kama sala hai ya leo',
+    cancel: 'Ghairi', saveChanges: 'Hifadhi Mabadiliko',
+    deletePrayer: 'Futa Sala?', deleteDesc: 'Hatua hii haiwezi kutendwa tena.',
+    delete: 'Futa', prayerUpdated: 'Sala imesasishwa', prayerAdded: 'Sala imeongezwa',
+    prayerDeleted: 'Sala imefutwa', prayerGenerated: '✨ Sala imetengenezwa!',
+    alreadySet: 'Sala imeshawekwa kwa leo', editBelow: 'Hariri hapa chini ikihitajika.',
+    genFailed: 'Utengenezaji umeshindikana', tryAgain: 'Jaribu tena',
+    validationError: 'Hitilafu ya uthibitishaji', titleContentRequired: 'Kichwa na maudhui vinahitajika.',
+  },
+} as const;
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

@@ -1,11 +1,31 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Cross, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
+
+const labels = {
+  en: {
+    welcomeBack: 'Welcome back', signInDashboard: 'Sign in to your dashboard',
+    email: 'Email address', password: 'Password', signIn: 'Sign In',
+    loginFailed: 'Login failed', accessInviteOnly: 'Access is by invitation only. Contact your administrator if you need access.',
+    members: 'Members', contributions: 'Contributions', prayers: 'Prayers',
+    bibleQuote: '"For where two or three gather in my name, there am I with them."',
+    bibleRef: '— Matthew 18:20',
+  },
+  sw: {
+    welcomeBack: 'Karibu tena', signInDashboard: 'Ingia kwenye dashibodi yako',
+    email: 'Barua pepe', password: 'Nenosiri', signIn: 'Ingia',
+    loginFailed: 'Kuingia kumeshindikana', accessInviteOnly: 'Ufikiaji ni kwa mwaliko tu. Wasiliana na msimamizi wako ikiwa unahitaji ufikiaji.',
+    members: 'Wanachama', contributions: 'Michango', prayers: 'Sala',
+    bibleQuote: '"Maana walipo wawili au watatu wamekusanyika kwa jina langu, nami nipo katikati yao."',
+    bibleRef: '— Mathayo 18:20',
+  },
+} as const;
 
 export default function LoginPage() {
   const { user, loading: authLoading, signIn } = useAuth();

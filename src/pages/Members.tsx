@@ -1,7 +1,37 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Search, Edit2, Trash2, Loader2, X } from 'lucide-react';
+
+const labels = {
+  en: {
+    title: 'Members', registered: 'registered member', registeredP: 'registered members',
+    addMember: 'Add Member', searchPlaceholder: 'Search by name or phone...',
+    noMembers: 'No members found.', addFirst: 'Add first member',
+    fullName: 'Full Name', phone: 'Phone', gender: 'Gender', joined: 'Joined',
+    male: 'Male', female: 'Female', other: 'Other',
+    editMember: 'Edit Member', addNew: 'Add New Member', enterName: 'Enter full name',
+    joinDate: 'Join Date', cancel: 'Cancel', saveChanges: 'Save Changes',
+    deleteMember: 'Delete Member?', deleteDesc: 'This action cannot be undone.',
+    delete: 'Delete', memberUpdated: 'Member updated', memberAdded: 'Member added',
+    memberDeleted: 'Member deleted', validationError: 'Validation error',
+    allFieldsRequired: 'All fields are required.',
+  },
+  sw: {
+    title: 'Wanachama', registered: 'mwanachama aliyesajiliwa', registeredP: 'wanachama waliosajiliwa',
+    addMember: 'Ongeza Mwanachama', searchPlaceholder: 'Tafuta kwa jina au simu...',
+    noMembers: 'Hakuna wanachama.', addFirst: 'Ongeza mwanachama wa kwanza',
+    fullName: 'Jina Kamili', phone: 'Simu', gender: 'Jinsia', joined: 'Alijiunga',
+    male: 'Me', female: 'Ke', other: 'Nyingine',
+    editMember: 'Hariri Mwanachama', addNew: 'Ongeza Mwanachama Mpya', enterName: 'Ingiza jina kamili',
+    joinDate: 'Tarehe ya Kujiunga', cancel: 'Ghairi', saveChanges: 'Hifadhi Mabadiliko',
+    deleteMember: 'Futa Mwanachama?', deleteDesc: 'Hatua hii haiwezi kutendwa tena.',
+    delete: 'Futa', memberUpdated: 'Mwanachama amesasishwa', memberAdded: 'Mwanachama ameongezwa',
+    memberDeleted: 'Mwanachama amefutwa', validationError: 'Hitilafu ya uthibitishaji',
+    allFieldsRequired: 'Sehemu zote zinahitajika.',
+  },
+} as const;
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

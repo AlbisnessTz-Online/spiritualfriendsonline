@@ -1,7 +1,27 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { Users, CreditCard, TrendingUp, BookOpen, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const labels = {
+  en: {
+    title: 'Dashboard', welcome: 'Welcome to Spiritual Friends Management',
+    addMember: 'Add Member', todayPrayer: "Today's Prayer",
+    totalMembers: 'Total Members', totalContributions: 'Total Contributions',
+    thisMonth: 'This Month', monthlyChart: 'Monthly Contributions (TSh)',
+    recentTx: 'Recent Transactions', viewAll: 'View all', noTx: 'No transactions yet.',
+    contributions: 'Contributions',
+  },
+  sw: {
+    title: 'Dashibodi', welcome: 'Karibu kwenye Usimamizi wa Marafiki wa Kiroho',
+    addMember: 'Ongeza Mwanachama', todayPrayer: 'Sala ya Leo',
+    totalMembers: 'Wanachama Wote', totalContributions: 'Michango Yote',
+    thisMonth: 'Mwezi Huu', monthlyChart: 'Michango ya Kila Mwezi (TSh)',
+    recentTx: 'Miamala ya Hivi Karibuni', viewAll: 'Tazama yote', noTx: 'Hakuna miamala bado.',
+    contributions: 'Michango',
+  },
+} as const;
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';

@@ -1,7 +1,37 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileText, CheckCircle, AlertCircle, Loader2, X } from 'lucide-react';
+
+const labels = {
+  en: {
+    title: 'SMS Import', subtitle: 'Upload a CSV of exported M-Pesa SMS messages to bulk-import transactions.',
+    howToPrepare: 'How to prepare your CSV file',
+    step1: 'Export SMS messages from your phone using an SMS backup app (e.g., "SMS Backup & Restore")',
+    step2: 'Open the export, copy M-Pesa SMS texts into a .csv file (one message per line)',
+    step3: 'Upload the file below – the system will detect and parse valid M-Pesa messages',
+    dropHere: 'Drop CSV file here or click to browse', onlyCsv: 'Only .csv files are accepted',
+    valid: 'valid', skipped: 'skipped', clear: 'Clear', import: 'Import',
+    imported: 'Imported!', importFailed: 'Import failed', invalidFile: 'Invalid file',
+    uploadCsv: 'Please upload a .csv file.', noValid: 'No valid transactions to import.',
+    status: 'Status', memberName: 'Member Name', phone: 'Phone', amount: 'Amount',
+    txId: 'Tx ID', date: 'Date',
+  },
+  sw: {
+    title: 'Ingiza SMS', subtitle: 'Pakia CSV ya ujumbe wa M-Pesa ili kuingiza miamala kwa wingi.',
+    howToPrepare: 'Jinsi ya kuandaa faili yako ya CSV',
+    step1: 'Hamisha ujumbe wa SMS kutoka simu yako kwa kutumia programu ya kuhifadhi SMS',
+    step2: 'Fungua hamishaji, nakili maandishi ya SMS za M-Pesa kwenye faili ya .csv (ujumbe mmoja kwa mstari)',
+    step3: 'Pakia faili hapa chini – mfumo utagundua na kuchambua ujumbe halali za M-Pesa',
+    dropHere: 'Dondosha faili ya CSV hapa au bofya kuvinjari', onlyCsv: 'Faili za .csv tu zinakubaliwa',
+    valid: 'halali', skipped: 'zilizorukwa', clear: 'Futa', import: 'Ingiza',
+    imported: 'Imeingizwa!', importFailed: 'Uingizaji umeshindikana', invalidFile: 'Faili batili',
+    uploadCsv: 'Tafadhali pakia faili ya .csv.', noValid: 'Hakuna miamala halali ya kuingiza.',
+    status: 'Hali', memberName: 'Jina la Mwanachama', phone: 'Simu', amount: 'Kiasi',
+    txId: 'Kitambulisho', date: 'Tarehe',
+  },
+} as const;
 import { Button } from '@/components/ui/button';
 
 interface ParsedTransaction {

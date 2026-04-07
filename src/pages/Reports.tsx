@@ -1,7 +1,25 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { Download, Loader2, TrendingUp, User } from 'lucide-react';
+
+const labels = {
+  en: {
+    title: 'Reports', year: 'Year', grandTotal: 'Grand total', exportCsv: 'Export CSV',
+    monthlySummary: 'Monthly Summary', memberContributions: 'Member Contributions',
+    monthlyChartTitle: 'Monthly Contributions', month: 'Month',
+    txCount: 'Transactions', totalTsh: 'Total (TSh)',
+    noMemberContrib: 'No member contributions for',
+  },
+  sw: {
+    title: 'Ripoti', year: 'Mwaka', grandTotal: 'Jumla kuu', exportCsv: 'Hamisha CSV',
+    monthlySummary: 'Muhtasari wa Kila Mwezi', memberContributions: 'Michango ya Wanachama',
+    monthlyChartTitle: 'Michango ya Kila Mwezi', month: 'Mwezi',
+    txCount: 'Miamala', totalTsh: 'Jumla (TSh)',
+    noMemberContrib: 'Hakuna michango ya wanachama kwa',
+  },
+} as const;
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

@@ -1,24 +1,29 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppTheme } from '@/contexts/ThemeContext';
 import {
   LayoutDashboard, Users, CreditCard, FileText, BookOpen,
   Upload, LogOut, Menu, X, Cross, Crown, Smartphone, Star, Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const navItems = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Members', href: '/members', icon: Users },
-  { label: 'Transactions', href: '/transactions', icon: CreditCard },
-  { label: 'Leaders', href: '/leaders', icon: Crown },
-  { label: 'SMS Import', href: '/sms-import', icon: Upload },
-  { label: 'Auto SMS', href: '/sms-webhook', icon: Smartphone },
-  { label: 'Reports', href: '/reports', icon: FileText },
-  { label: 'Daily Prayer', href: '/prayers', icon: BookOpen },
-  { label: 'About', href: '/about', icon: Star },
-  { label: 'Settings', href: '/settings', icon: Settings },
-];
+const navLabels = {
+  en: {
+    dashboard: 'Dashboard', members: 'Members', transactions: 'Transactions',
+    leaders: 'Leaders', smsImport: 'SMS Import', autoSms: 'Auto SMS',
+    reports: 'Reports', dailyPrayer: 'Daily Prayer', about: 'About',
+    settings: 'Settings', signedIn: 'Signed in as', signOut: 'Sign Out',
+    system: 'Management System',
+  },
+  sw: {
+    dashboard: 'Dashibodi', members: 'Wanachama', transactions: 'Miamala',
+    leaders: 'Viongozi', smsImport: 'Ingiza SMS', autoSms: 'SMS Otomatiki',
+    reports: 'Ripoti', dailyPrayer: 'Sala ya Kila Siku', about: 'Kuhusu',
+    settings: 'Mipangilio', signedIn: 'Umeingia kama', signOut: 'Ondoka',
+    system: 'Mfumo wa Usimamizi',
+  },
+} as const;
 
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
