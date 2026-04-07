@@ -28,8 +28,23 @@ const navLabels = {
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { signOut, user } = useAuth();
+  const { lang } = useAppTheme();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const t = navLabels[lang];
+
+  const navItems = [
+    { label: t.dashboard, href: '/dashboard', icon: LayoutDashboard },
+    { label: t.members, href: '/members', icon: Users },
+    { label: t.transactions, href: '/transactions', icon: CreditCard },
+    { label: t.leaders, href: '/leaders', icon: Crown },
+    { label: t.smsImport, href: '/sms-import', icon: Upload },
+    { label: t.autoSms, href: '/sms-webhook', icon: Smartphone },
+    { label: t.reports, href: '/reports', icon: FileText },
+    { label: t.dailyPrayer, href: '/prayers', icon: BookOpen },
+    { label: t.about, href: '/about', icon: Star },
+    { label: t.settings, href: '/settings', icon: Settings },
+  ];
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -55,7 +70,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
           <div>
             <p className="font-display font-bold text-sm text-white leading-tight">Spiritual Friends</p>
-            <p className="text-xs text-sidebar-foreground/60">Management System</p>
+            <p className="text-xs text-sidebar-foreground/60">{t.system}</p>
           </div>
           <button className="ml-auto lg:hidden text-sidebar-foreground/60 hover:text-white" onClick={() => setSidebarOpen(false)}>
             <X className="w-5 h-5" />
@@ -88,7 +103,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
         {/* User + Logout */}
         <div className="px-3 py-4 border-t border-sidebar-border">
           <div className="px-3 py-2 mb-2">
-            <p className="text-xs text-sidebar-foreground/50 uppercase tracking-wide font-medium">Signed in as</p>
+            <p className="text-xs text-sidebar-foreground/50 uppercase tracking-wide font-medium">{t.signedIn}</p>
             <p className="text-sm text-sidebar-foreground/90 truncate mt-0.5">{user?.email}</p>
           </div>
           <button
@@ -96,7 +111,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-red-400 transition-all"
           >
             <LogOut className="w-4.5 h-4.5" />
-            Sign Out
+            {t.signOut}
           </button>
         </div>
       </aside>
