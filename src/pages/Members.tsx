@@ -3,6 +3,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Search, Edit2, Trash2, Loader2, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 
 const labels = {
   en: {
@@ -32,19 +45,6 @@ const labels = {
     allFieldsRequired: 'Sehemu zote zinahitajika.',
   },
 } as const;
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
-} from '@/components/ui/dialog';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
 
 interface Member {
   id: string;
@@ -58,6 +58,8 @@ const emptyForm = { full_name: '', phone_number: '', gender: 'Male', join_date: 
 
 export default function MembersPage() {
   const { toast } = useToast();
+  const { lang } = useAppTheme();
+  const t = labels[lang];
   const [members, setMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -81,18 +83,18 @@ export default function MembersPage() {
 
   const handleSave = async () => {
     if (!form.full_name || !form.phone_number || !form.gender) {
-      toast({ title: 'Validation error', description: 'All fields are required.', variant: 'destructive' });
+      toast({ title: t.validationError, description: t.allFieldsRequired, variant: 'destructive' });
       return;
     }
     setSaving(true);
     if (editingMember) {
       const { error } = await supabase.from('members').update(form).eq('id', editingMember.id);
       if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
-      else { toast({ title: 'Member updated' }); setDialogOpen(false); fetchMembers(); }
+      else { toast({ title: t.memberUpdated }); setDialogOpen(false); fetchMembers(); }
     } else {
       const { error } = await supabase.from('members').insert({ ...form });
       if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
-      else { toast({ title: 'Member added' }); setDialogOpen(false); fetchMembers(); }
+      else { toast({ title: t.memberAdded }); setDialogOpen(false); fetchMembers(); }
     }
     setSaving(false);
   };
@@ -101,7 +103,7 @@ export default function MembersPage() {
     if (!deleteId) return;
     const { error } = await supabase.from('members').delete().eq('id', deleteId);
     if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    else { toast({ title: 'Member deleted' }); fetchMembers(); }
+    else { toast({ title: t.memberDeleted }); fetchMembers(); }
     setDeleteId(null);
   };
 
@@ -113,23 +115,17 @@ export default function MembersPage() {
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Members</h1>
-          <p className="text-muted-foreground text-sm mt-1">{members.length} registered member{members.length !== 1 ? 's' : ''}</p>
+          <h1 className="text-2xl font-display font-bold text-foreground">{t.title}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{members.length} {members.length !== 1 ? t.registeredP : t.registered}</p>
         </div>
         <Button onClick={openAdd} className="gap-2">
-          <Plus className="w-4 h-4" /> Add Member
+          <Plus className="w-4 h-4" /> {t.addMember}
         </Button>
       </div>
 
-      {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          className="pl-9"
-          placeholder="Search by name or phone..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <Input className="pl-9" placeholder={t.searchPlaceholder} value={search} onChange={(e) => setSearch(e.target.value)} />
         {search && (
           <button className="absolute right-3 top-1/2 -translate-y-1/2" onClick={() => setSearch('')}>
             <X className="w-4 h-4 text-muted-foreground" />
@@ -137,14 +133,13 @@ export default function MembersPage() {
         )}
       </div>
 
-      {/* Table */}
       <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
         {loading ? (
           <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center">
-            <p className="text-muted-foreground">No members found.</p>
-            <Button variant="outline" className="mt-4" onClick={openAdd}>Add first member</Button>
+            <p className="text-muted-foreground">{t.noMembers}</p>
+            <Button variant="outline" className="mt-4" onClick={openAdd}>{t.addFirst}</Button>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -152,10 +147,10 @@ export default function MembersPage() {
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
                   <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">#</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Full Name</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Phone</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Gender</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Joined</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t.fullName}</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t.phone}</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t.gender}</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t.joined}</th>
                   <th className="px-5 py-3" />
                 </tr>
               </thead>
@@ -167,7 +162,7 @@ export default function MembersPage() {
                     <td className="px-5 py-3.5 text-foreground text-sm">{m.phone_number}</td>
                     <td className="px-5 py-3.5">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${m.gender === 'Male' ? 'bg-blue-100 text-blue-700' : m.gender === 'Female' ? 'bg-pink-100 text-pink-700' : 'bg-muted text-muted-foreground'}`}>
-                        {m.gender}
+                        {m.gender === 'Male' ? t.male : m.gender === 'Female' ? t.female : t.other}
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-muted-foreground text-sm">{m.join_date}</td>
@@ -189,57 +184,55 @@ export default function MembersPage() {
         )}
       </div>
 
-      {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingMember ? 'Edit Member' : 'Add New Member'}</DialogTitle>
+            <DialogTitle>{editingMember ? t.editMember : t.addNew}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label>Full Name</Label>
-              <Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} placeholder="Enter full name" />
+              <Label>{t.fullName}</Label>
+              <Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} placeholder={t.enterName} />
             </div>
             <div className="space-y-2">
-              <Label>Phone Number</Label>
+              <Label>{t.phone}</Label>
               <Input value={form.phone_number} onChange={(e) => setForm({ ...form, phone_number: e.target.value })} placeholder="07XXXXXXXX" />
             </div>
             <div className="space-y-2">
-              <Label>Gender</Label>
+              <Label>{t.gender}</Label>
               <Select value={form.gender} onValueChange={(v) => setForm({ ...form, gender: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
+                  <SelectItem value="Male">{t.male}</SelectItem>
+                  <SelectItem value="Female">{t.female}</SelectItem>
+                  <SelectItem value="Other">{t.other}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Join Date</Label>
+              <Label>{t.joinDate}</Label>
               <Input type="date" value={form.join_date} onChange={(e) => setForm({ ...form, join_date: e.target.value })} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>{t.cancel}</Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {editingMember ? 'Save Changes' : 'Add Member'}
+              {editingMember ? t.saveChanges : t.addMember}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Member?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle>{t.deleteMember}</AlertDialogTitle>
+            <AlertDialogDescription>{t.deleteDesc}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{t.delete}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
