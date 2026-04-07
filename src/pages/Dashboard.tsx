@@ -53,6 +53,8 @@ const StatCard = ({
 );
 
 export default function DashboardPage() {
+  const { lang } = useAppTheme();
+  const t = labels[lang];
   const [stats, setStats] = useState<Stats>({
     memberCount: 0, totalContributions: 0, thisMonthContributions: 0,
     recentTransactions: [], todayPrayer: null, monthlyData: [],
@@ -126,12 +128,12 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground text-sm mt-1">Welcome to Spiritual Friends Management</p>
+          <h1 className="text-2xl font-display font-bold text-foreground">{t.title}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{t.welcome}</p>
         </div>
         <Link to="/members">
           <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors">
-            <Plus className="w-4 h-4" /> Add Member
+            <Plus className="w-4 h-4" /> {t.addMember}
           </button>
         </Link>
       </div>
@@ -142,7 +144,7 @@ export default function DashboardPage() {
           <div className="flex items-start gap-3">
             <BookOpen className="w-5 h-5 text-white/80 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-white/70 text-xs uppercase tracking-wide font-medium mb-1">Today's Prayer</p>
+              <p className="text-white/70 text-xs uppercase tracking-wide font-medium mb-1">{t.todayPrayer}</p>
               <h3 className="text-white font-display font-semibold text-lg mb-2">{stats.todayPrayer.title}</h3>
               <p className="text-white/85 text-sm leading-relaxed line-clamp-3">{stats.todayPrayer.content}</p>
             </div>
@@ -152,10 +154,10 @@ export default function DashboardPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <StatCard label="Total Members" value={stats.memberCount} icon={Users} color="bg-primary" />
-        <StatCard label="Total Contributions" value={fmt(stats.totalContributions)} icon={CreditCard} color="bg-secondary" />
+        <StatCard label={t.totalMembers} value={stats.memberCount} icon={Users} color="bg-primary" />
+        <StatCard label={t.totalContributions} value={fmt(stats.totalContributions)} icon={CreditCard} color="bg-secondary" />
         <StatCard
-          label="This Month"
+          label={t.thisMonth}
           value={fmt(stats.thisMonthContributions)}
           icon={TrendingUp}
           color="bg-accent"
@@ -165,7 +167,7 @@ export default function DashboardPage() {
 
       {/* Chart */}
       <div className="bg-card rounded-2xl border border-border p-6">
-        <h2 className="font-display font-semibold text-foreground mb-4">Monthly Contributions (TSh)</h2>
+        <h2 className="font-display font-semibold text-foreground mb-4">{t.monthlyChart}</h2>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={stats.monthlyData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -173,7 +175,7 @@ export default function DashboardPage() {
             <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
             <Tooltip
               contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
-              formatter={(v: number) => [`TSh ${v.toLocaleString()}`, 'Contributions']}
+              formatter={(v: number) => [`TSh ${v.toLocaleString()}`, t.contributions]}
             />
             <Bar dataKey="total" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
           </BarChart>
@@ -183,11 +185,11 @@ export default function DashboardPage() {
       {/* Recent Transactions */}
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-border">
-          <h2 className="font-display font-semibold text-foreground">Recent Transactions</h2>
-          <Link to="/transactions" className="text-primary text-sm font-medium hover:underline">View all</Link>
+          <h2 className="font-display font-semibold text-foreground">{t.recentTx}</h2>
+          <Link to="/transactions" className="text-primary text-sm font-medium hover:underline">{t.viewAll}</Link>
         </div>
         {stats.recentTransactions.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">No transactions yet.</div>
+          <div className="p-8 text-center text-muted-foreground">{t.noTx}</div>
         ) : (
           <div className="divide-y divide-border">
             {stats.recentTransactions.map((tx) => (
