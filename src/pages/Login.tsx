@@ -29,6 +29,8 @@ const labels = {
 
 export default function LoginPage() {
   const { user, loading: authLoading, signIn } = useAuth();
+  const { lang } = useAppTheme();
+  const t = labels[lang];
   const { toast } = useToast();
 
   const [email, setEmail] = useState('');
@@ -43,14 +45,13 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await signIn(email, password);
     if (error) {
-      toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
+      toast({ title: t.loginFailed, description: error.message, variant: 'destructive' });
     }
     setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12"
         style={{ background: 'linear-gradient(135deg, hsl(221 83% 53%), hsl(158 64% 45%))' }}>
         <div className="flex items-center gap-3">
@@ -62,13 +63,13 @@ export default function LoginPage() {
 
         <div>
           <blockquote className="text-white/90 text-2xl font-display font-semibold leading-relaxed mb-6">
-            "For where two or three gather in my name, there am I with them."
+            {t.bibleQuote}
           </blockquote>
-          <p className="text-white/70 text-sm">— Matthew 18:20</p>
+          <p className="text-white/70 text-sm">{t.bibleRef}</p>
         </div>
 
         <div className="grid grid-cols-3 gap-4">
-          {['Members', 'Contributions', 'Prayers'].map((label) => (
+          {[t.members, t.contributions, t.prayers].map((label) => (
             <div key={label} className="bg-white/10 rounded-xl p-4 text-center">
               <p className="text-white/60 text-xs uppercase tracking-wide">{label}</p>
             </div>
@@ -76,10 +77,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right panel */}
       <div className="flex-1 flex items-center justify-center p-6 bg-background">
         <div className="w-full max-w-md">
-          {/* Mobile logo */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Cross className="w-4 h-4 text-primary-foreground" />
@@ -88,53 +87,31 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-display font-bold text-foreground mb-2">Welcome back</h1>
-            <p className="text-muted-foreground">Sign in to your dashboard</p>
+            <h1 className="text-3xl font-display font-bold text-foreground mb-2">{t.welcomeBack}</h1>
+            <p className="text-muted-foreground">{t.signInDashboard}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="leader@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <Label htmlFor="email">{t.email}</Label>
+              <Input id="email" type="email" placeholder="leader@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t.password}</Label>
               <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
+                <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
-
             <Button type="submit" className="w-full h-11" disabled={loading}>
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Sign In
+              {t.signIn}
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            Access is by invitation only. Contact your administrator if you need access.
-          </p>
+          <p className="mt-6 text-center text-xs text-muted-foreground">{t.accessInviteOnly}</p>
         </div>
       </div>
     </div>

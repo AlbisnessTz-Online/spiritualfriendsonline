@@ -3,6 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { Download, Loader2, TrendingUp, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const labels = {
   en: {
@@ -11,6 +15,7 @@ const labels = {
     monthlyChartTitle: 'Monthly Contributions', month: 'Month',
     txCount: 'Transactions', totalTsh: 'Total (TSh)',
     noMemberContrib: 'No member contributions for',
+    total: 'Total',
   },
   sw: {
     title: 'Ripoti', year: 'Mwaka', grandTotal: 'Jumla kuu', exportCsv: 'Hamisha CSV',
@@ -18,29 +23,20 @@ const labels = {
     monthlyChartTitle: 'Michango ya Kila Mwezi', month: 'Mwezi',
     txCount: 'Miamala', totalTsh: 'Jumla (TSh)',
     noMemberContrib: 'Hakuna michango ya wanachama kwa',
+    total: 'Jumla',
   },
 } as const;
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-interface MonthlyReport {
-  month: string;
-  total: number;
-  count: number;
-}
-
+interface MonthlyReport { month: string; total: number; count: number; }
 interface MemberReport {
-  member_name: string;
-  phone_number: string;
-  total: number;
-  count: number;
+  member_name: string; phone_number: string; total: number; count: number;
   transactions: Array<{ transaction_date: string; amount: number; transaction_id: string }>;
 }
 
 export default function ReportsPage() {
   const { toast } = useToast();
+  const { lang } = useAppTheme();
+  const t = labels[lang];
   const [monthlyData, setMonthlyData] = useState<MonthlyReport[]>([]);
   const [memberData, setMemberData] = useState<MemberReport[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,8 +52,6 @@ export default function ReportsPage() {
       .order('transaction_date', { ascending: true });
 
     const txs = data || [];
-
-    // Monthly aggregation
     const monthMap: Record<string, { total: number; count: number }> = {};
     for (let m = 1; m <= 12; m++) {
       const key = new Date(Number(year), m - 1).toLocaleString('default', { month: 'short' });
@@ -65,14 +59,10 @@ export default function ReportsPage() {
     }
     txs.forEach((tx) => {
       const key = new Date(tx.transaction_date).toLocaleString('default', { month: 'short' });
-      if (monthMap[key]) {
-        monthMap[key].total += Number(tx.amount);
-        monthMap[key].count += 1;
-      }
+      if (monthMap[key]) { monthMap[key].total += Number(tx.amount); monthMap[key].count += 1; }
     });
     setMonthlyData(Object.entries(monthMap).map(([month, v]) => ({ month, ...v })));
 
-    // Member aggregation
     const memberMap: Record<string, MemberReport> = {};
     txs.forEach((tx) => {
       const key = tx.phone_number;
@@ -88,14 +78,12 @@ export default function ReportsPage() {
   useEffect(() => { fetchReports(); }, [year]);
 
   const exportMonthlyCSV = () => {
-    const rows = [['Month', 'Total (TSh)', 'Transactions'],
-      ...monthlyData.map((r) => [r.month, r.total.toFixed(2), r.count])];
+    const rows = [[t.month, t.totalTsh, t.txCount], ...monthlyData.map((r) => [r.month, r.total.toFixed(2), r.count])];
     download(rows, `monthly_report_${year}.csv`);
   };
 
   const exportMembersCSV = () => {
-    const rows = [['Member Name', 'Phone', 'Total (TSh)', 'Transactions'],
-      ...memberData.map((r) => [r.member_name, r.phone_number, r.total.toFixed(2), r.count])];
+    const rows = [[t.memberContributions, t.totalTsh, t.txCount], ...memberData.map((r) => [r.member_name, r.total.toFixed(2), r.count])];
     download(rows, `member_contributions_${year}.csv`);
   };
 
@@ -110,30 +98,28 @@ export default function ReportsPage() {
   };
 
   const grandTotal = monthlyData.reduce((s, m) => s + m.total, 0);
-
-  const tabs = [{ id: 'monthly', label: 'Monthly Summary' }, { id: 'members', label: 'Member Contributions' }] as const;
+  const tabs = [{ id: 'monthly', label: t.monthlySummary }, { id: 'members', label: t.memberContributions }] as const;
 
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Reports</h1>
-          <p className="text-muted-foreground text-sm mt-1">Year: {year} · Grand total: <span className="font-semibold text-secondary">TSh {grandTotal.toLocaleString()}</span></p>
+          <h1 className="text-2xl font-display font-bold text-foreground">{t.title}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{t.year}: {year} · {t.grandTotal}: <span className="font-semibold text-secondary">TSh {grandTotal.toLocaleString()}</span></p>
         </div>
         <div className="flex items-center gap-3">
           <div className="space-y-1">
-            <Label className="text-xs">Year</Label>
+            <Label className="text-xs">{t.year}</Label>
             <Input type="number" className="w-24" value={year} onChange={(e) => setYear(e.target.value)} min="2020" max="2030" />
           </div>
           <div className="pt-5">
             <Button variant="outline" onClick={activeTab === 'monthly' ? exportMonthlyCSV : exportMembersCSV} className="gap-2">
-              <Download className="w-4 h-4" /> Export CSV
+              <Download className="w-4 h-4" /> {t.exportCsv}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-1 bg-muted rounded-xl p-1 w-fit">
         {tabs.map((tab) => (
           <button
@@ -150,9 +136,8 @@ export default function ReportsPage() {
         <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
       ) : activeTab === 'monthly' ? (
         <div className="space-y-5">
-          {/* Chart */}
           <div className="bg-card rounded-2xl border border-border p-6">
-            <h2 className="font-display font-semibold text-foreground mb-4">Monthly Contributions – {year}</h2>
+            <h2 className="font-display font-semibold text-foreground mb-4">{t.monthlyChartTitle} – {year}</h2>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -160,21 +145,20 @@ export default function ReportsPage() {
                 <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
                 <Tooltip
                   contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
-                  formatter={(v: number) => [`TSh ${v.toLocaleString()}`, 'Total']}
+                  formatter={(v: number) => [`TSh ${v.toLocaleString()}`, t.total]}
                 />
                 <Bar dataKey="total" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Table */}
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Month</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Transactions</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total (TSh)</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t.month}</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t.txCount}</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t.totalTsh}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -194,7 +178,7 @@ export default function ReportsPage() {
           {memberData.length === 0 ? (
             <div className="bg-card rounded-2xl border border-border py-16 text-center">
               <User className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">No member contributions for {year}.</p>
+              <p className="text-muted-foreground">{t.noMemberContrib} {year}.</p>
             </div>
           ) : memberData.map((m) => (
             <details key={m.phone_number} className="bg-card rounded-xl border border-border overflow-hidden group">
@@ -205,7 +189,7 @@ export default function ReportsPage() {
                   </div>
                   <div>
                     <p className="font-medium text-foreground">{m.member_name}</p>
-                    <p className="text-xs text-muted-foreground">{m.phone_number} · {m.count} transaction{m.count !== 1 ? 's' : ''}</p>
+                    <p className="text-xs text-muted-foreground">{m.phone_number} · {m.count} {m.count !== 1 ? t.txCount.toLowerCase() : t.txCount.toLowerCase()}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
