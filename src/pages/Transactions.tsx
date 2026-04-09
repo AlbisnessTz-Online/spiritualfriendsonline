@@ -56,11 +56,12 @@ interface Transaction {
   transaction_date: string;
   notes: string | null;
   source: string;
+  category: string;
 }
 
 const emptyForm = {
   member_name: '', phone_number: '', amount: '', transaction_id: '',
-  transaction_date: new Date().toISOString().split('T')[0], notes: '',
+  transaction_date: new Date().toISOString().split('T')[0], notes: '', category: 'weekly',
 };
 
 export default function TransactionsPage() {
