@@ -307,6 +307,25 @@ export default function LeadersPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {/* Invite Link Dialog */}
+      <Dialog open={!!inviteLinkDialog} onOpenChange={(o) => { if (!o) { setInviteLinkDialog(null); setLinkCopied(false); } }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>🔗 {t.inviteLink}</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-2">
+            <p className="text-sm text-muted-foreground">{t.inviteLinkDesc}</p>
+            <div className="flex items-center gap-2">
+              <Input value={inviteLinkDialog ? getInviteLink(inviteLinkDialog) : ''} readOnly className="bg-muted text-xs" />
+              <Button size="sm" variant="outline" onClick={() => inviteLinkDialog && handleCopyLink(inviteLinkDialog)} className="gap-1.5 flex-shrink-0">
+                {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {linkCopied ? t.linkCopied : t.copyLink}
+              </Button>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setInviteLinkDialog(null); setLinkCopied(false); }}>{t.close}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
