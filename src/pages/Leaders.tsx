@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Loader2, Crown, Shield, User, BookOpen, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, Trash2, Loader2, Crown, Shield, User, BookOpen, CheckCircle2, Clock, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,18 +32,21 @@ const labels = {
     awaitingSignup: 'Awaiting Sign-up', pending: 'Pending',
     noLeaders: 'No leaders registered yet.', registerFirst: 'Register first leader',
     fullName: 'Full Name', email: 'Email Address', role: 'Role',
-    howItWorks: 'How it works:', howItWorksDesc: 'Once registered, share the login page URL with this leader. When they sign up using this exact email address, they will automatically be assigned the',
+    howItWorks: 'How it works:', howItWorksDesc: 'Once registered, share the invite link with this leader. When they sign up using the link, they will automatically be assigned the',
     roleAutoSuffix: 'role.',
     cancel: 'Cancel', registerBtn: 'Register Leader',
     removeLeader: 'Remove Leader?', removeDesc: 'This will remove their registration.',
     remove: 'Remove', leaderRegistered: '✓ Leader registered!',
     leaderRemoved: 'Leader removed',
-    tip: '💡 Registered leaders must sign up at the login page using their registered email. Their role will be assigned automatically.',
+    tip: '💡 Share the invite link with pending leaders. Their role will be assigned automatically when they sign up.',
     admin: 'Admin', chairperson: 'Chairperson', treasurer: 'Mr. Treasurer',
     secretary: 'Secretary', disciplineLeader: 'Discipline Leader',
     adminDesc: 'Full system access', chairpersonDesc: 'Group chair & leader',
     treasurerDesc: 'Manages finances & contributions', secretaryDesc: 'Manages records & members',
     disciplineLeaderDesc: 'Maintains group discipline',
+    inviteLink: 'Invite Link', inviteLinkDesc: 'Share this link with the leader to sign up:',
+    copyLink: 'Copy Link', linkCopied: 'Link copied!', close: 'Close',
+    copyInviteLink: 'Copy invite link',
   },
   sw: {
     title: 'Viongozi', subtitle: 'Sajili viongozi wa kikundi na uwagawie majukumu',
@@ -52,18 +55,21 @@ const labels = {
     awaitingSignup: 'Wanaosubiri Usajili', pending: 'Inasubiri',
     noLeaders: 'Hakuna viongozi waliosajiliwa bado.', registerFirst: 'Sajili kiongozi wa kwanza',
     fullName: 'Jina Kamili', email: 'Barua Pepe', role: 'Jukumu',
-    howItWorks: 'Jinsi inavyofanya kazi:', howItWorksDesc: 'Baada ya kusajili, shiriki URL ya ukurasa wa kuingia na kiongozi huyu. Atakapojisajili kwa kutumia barua pepe hii, atapewa jukumu la',
+    howItWorks: 'Jinsi inavyofanya kazi:', howItWorksDesc: 'Baada ya kusajili, shiriki kiungo cha mwaliko na kiongozi huyu. Atakapojisajili kupitia kiungo hicho, atapewa jukumu la',
     roleAutoSuffix: 'kiautomatiki.',
     cancel: 'Ghairi', registerBtn: 'Sajili Kiongozi',
     removeLeader: 'Ondoa Kiongozi?', removeDesc: 'Hii itaondoa usajili wao.',
     remove: 'Ondoa', leaderRegistered: '✓ Kiongozi amesajiliwa!',
     leaderRemoved: 'Kiongozi ameondolewa',
-    tip: '💡 Viongozi waliosajiliwa lazima wajisajili kwenye ukurasa wa kuingia kwa kutumia barua pepe yao iliyosajiliwa.',
+    tip: '💡 Shiriki kiungo cha mwaliko na viongozi wanaosubiri. Jukumu lao litapewa kiautomatiki watakapojisajili.',
     admin: 'Msimamizi', chairperson: 'Mwenyekiti', treasurer: 'Mweka Hazina',
     secretary: 'Katibu', disciplineLeader: 'Kiongozi wa Nidhamu',
     adminDesc: 'Ufikiaji kamili wa mfumo', chairpersonDesc: 'Mwenyekiti & kiongozi wa kikundi',
     treasurerDesc: 'Anasimamia fedha na michango', secretaryDesc: 'Anasimamia kumbukumbu na wanachama',
     disciplineLeaderDesc: 'Anadumisha nidhamu ya kikundi',
+    inviteLink: 'Kiungo cha Mwaliko', inviteLinkDesc: 'Shiriki kiungo hiki na kiongozi ili ajisajili:',
+    copyLink: 'Nakili Kiungo', linkCopied: 'Kiungo kimenakiliwa!', close: 'Funga',
+    copyInviteLink: 'Nakili kiungo cha mwaliko',
   },
 } as const;
 
@@ -77,6 +83,18 @@ export default function LeadersPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({ email: '', full_name: '', role: 'treasurer' as AppRole });
+  const [inviteLinkDialog, setInviteLinkDialog] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const getInviteLink = (email: string) =>
+    `${window.location.origin}/login?invite=${encodeURIComponent(email.toLowerCase())}`;
+
+  const handleCopyLink = (email: string) => {
+    navigator.clipboard.writeText(getInviteLink(email));
+    setLinkCopied(true);
+    toast({ title: t.linkCopied });
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
 
   const ROLE_CONFIG: Record<AppRole, { label: string; icon: React.ElementType; color: string; description: string }> = {
     admin: { label: t.admin, icon: Shield, color: 'bg-primary text-primary-foreground', description: t.adminDesc },
@@ -108,6 +126,7 @@ export default function LeadersPage() {
     else {
       toast({ title: t.leaderRegistered, description: `${form.full_name} → ${ROLE_CONFIG[form.role].label}` });
       setDialogOpen(false);
+      setInviteLinkDialog(form.email.toLowerCase());
       setForm({ email: '', full_name: '', role: 'treasurer' });
       fetchInvitations();
     }
@@ -210,10 +229,13 @@ export default function LeadersPage() {
                     <p className="font-medium text-foreground">{inv.full_name}</p>
                     <p className="text-xs text-muted-foreground">{inv.email}</p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">{cfg.label}</span>
                     <span className="px-2.5 py-1 rounded-full text-xs bg-accent/15 text-accent-foreground font-medium">{t.pending}</span>
                   </div>
+                  <button onClick={() => handleCopyLink(inv.email)} title={t.copyInviteLink} className="p-1.5 hover:bg-primary/10 rounded-lg text-muted-foreground hover:text-primary transition-colors flex-shrink-0">
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
                   <button onClick={() => setDeleteId(inv.id)} className="p-1.5 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-colors flex-shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -285,6 +307,25 @@ export default function LeadersPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {/* Invite Link Dialog */}
+      <Dialog open={!!inviteLinkDialog} onOpenChange={(o) => { if (!o) { setInviteLinkDialog(null); setLinkCopied(false); } }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>🔗 {t.inviteLink}</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-2">
+            <p className="text-sm text-muted-foreground">{t.inviteLinkDesc}</p>
+            <div className="flex items-center gap-2">
+              <Input value={inviteLinkDialog ? getInviteLink(inviteLinkDialog) : ''} readOnly className="bg-muted text-xs" />
+              <Button size="sm" variant="outline" onClick={() => inviteLinkDialog && handleCopyLink(inviteLinkDialog)} className="gap-1.5 flex-shrink-0">
+                {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {linkCopied ? t.linkCopied : t.copyLink}
+              </Button>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setInviteLinkDialog(null); setLinkCopied(false); }}>{t.close}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
