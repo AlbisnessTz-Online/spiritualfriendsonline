@@ -239,9 +239,23 @@ export default function TransactionsPage() {
                 <Input value={form.transaction_id} onChange={(e) => setForm({ ...form, transaction_id: e.target.value })} placeholder="QAZ1234567" />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>{t.date}</Label>
-              <Input type="date" value={form.transaction_date} onChange={(e) => setForm({ ...form, transaction_date: e.target.value })} />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>{t.date}</Label>
+                <Input type="date" value={form.transaction_date} onChange={(e) => setForm({ ...form, transaction_date: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>{t.category}</Label>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="weekly">{t.weekly}</option>
+                  <option value="udiakonia">{t.udiakonia}</option>
+                  <option value="other">{t.other}</option>
+                </select>
+              </div>
             </div>
             <div className="space-y-2">
               <Label>{t.notes}</Label>
