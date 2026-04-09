@@ -112,6 +112,7 @@ export default function TransactionsPage() {
       member_name: form.member_name, phone_number: form.phone_number,
       amount: Number(form.amount), transaction_id: form.transaction_id,
       transaction_date: form.transaction_date, notes: form.notes || null,
+      category: form.category,
     });
     if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
     else { toast({ title: t.txAdded }); setDialogOpen(false); fetchTransactions(); }
@@ -178,7 +179,7 @@ export default function TransactionsPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
-                  {[t.memberName, t.phone, t.amount, t.txId, t.date, t.source, ''].map((h) => (
+                  {[t.memberName, t.phone, t.amount, t.txId, t.date, t.category, t.source, ''].map((h) => (
                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{h}</th>
                   ))}
                 </tr>
@@ -191,6 +192,11 @@ export default function TransactionsPage() {
                     <td className="px-5 py-3.5 text-secondary font-semibold">{Number(tx.amount).toLocaleString()}</td>
                     <td className="px-5 py-3.5 text-muted-foreground text-sm font-mono">{tx.transaction_id}</td>
                     <td className="px-5 py-3.5 text-muted-foreground text-sm">{tx.transaction_date}</td>
+                    <td className="px-5 py-3.5">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${tx.category === 'udiakonia' ? 'bg-secondary/15 text-secondary' : tx.category === 'other' ? 'bg-muted text-muted-foreground' : 'bg-primary/15 text-primary'}`}>
+                        {tx.category === 'udiakonia' ? t.udiakonia : tx.category === 'other' ? t.other : t.weekly}
+                      </span>
+                    </td>
                     <td className="px-5 py-3.5">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${tx.source === 'sms_import' ? 'bg-accent/15 text-accent-foreground' : 'bg-muted text-muted-foreground'}`}>
                         {tx.source === 'sms_import' ? t.smsImport : t.manual}
