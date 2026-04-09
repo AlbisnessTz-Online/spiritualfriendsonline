@@ -229,10 +229,13 @@ export default function LeadersPage() {
                     <p className="font-medium text-foreground">{inv.full_name}</p>
                     <p className="text-xs text-muted-foreground">{inv.email}</p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">{cfg.label}</span>
                     <span className="px-2.5 py-1 rounded-full text-xs bg-accent/15 text-accent-foreground font-medium">{t.pending}</span>
                   </div>
+                  <button onClick={() => handleCopyLink(inv.email)} title={t.copyInviteLink} className="p-1.5 hover:bg-primary/10 rounded-lg text-muted-foreground hover:text-primary transition-colors flex-shrink-0">
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
                   <button onClick={() => setDeleteId(inv.id)} className="p-1.5 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-colors flex-shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
