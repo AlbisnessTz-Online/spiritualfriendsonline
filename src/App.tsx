@@ -20,6 +20,7 @@ import PrayersPage from "./pages/Prayers";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import AboutPage from "./pages/About";
+import UdiakoniaPublicPage from "./pages/UdiakoniaPublic";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/reports" element={<ProtectedRoute><AppLayout><ReportsPage /></AppLayout></ProtectedRoute>} />
               <Route path="/prayers" element={<ProtectedRoute><AppLayout><PrayersPage /></AppLayout></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
+              <Route path="/udiakonia" element={<UdiakoniaPublicPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
