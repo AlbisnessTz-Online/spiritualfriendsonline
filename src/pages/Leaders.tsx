@@ -83,6 +83,18 @@ export default function LeadersPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({ email: '', full_name: '', role: 'treasurer' as AppRole });
+  const [inviteLinkDialog, setInviteLinkDialog] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const getInviteLink = (email: string) =>
+    `${window.location.origin}/login?invite=${encodeURIComponent(email.toLowerCase())}`;
+
+  const handleCopyLink = (email: string) => {
+    navigator.clipboard.writeText(getInviteLink(email));
+    setLinkCopied(true);
+    toast({ title: t.linkCopied });
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
 
   const ROLE_CONFIG: Record<AppRole, { label: string; icon: React.ElementType; color: string; description: string }> = {
     admin: { label: t.admin, icon: Shield, color: 'bg-primary text-primary-foreground', description: t.adminDesc },
