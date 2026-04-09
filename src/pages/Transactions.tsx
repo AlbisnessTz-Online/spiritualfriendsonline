@@ -21,11 +21,12 @@ const labels = {
     addTx: 'Add Transaction', searchPlaceholder: 'Search by name, phone, or transaction ID...',
     noTx: 'No transactions found.', addFirst: 'Add first transaction',
     memberName: 'Member Name', phone: 'Phone', amount: 'Amount (TSh)',
-    txId: 'Transaction ID', date: 'Date', source: 'Source',
+    txId: 'Transaction ID', date: 'Date', source: 'Source', category: 'Category',
     fullName: 'Full name', notes: 'Notes (optional)', monthlyContrib: 'Monthly contribution...',
     cancel: 'Cancel', save: 'Save', deleteTx: 'Delete Transaction?',
     deleteDesc: 'This cannot be undone.', delete: 'Delete',
     smsImport: 'SMS Import', manual: 'Manual',
+    weekly: 'Weekly', udiakonia: 'Udiakonia', other: 'Other',
     txAdded: 'Transaction added', txDeleted: 'Transaction deleted',
     validationError: 'Validation error', requiredMissing: 'Required fields are missing.',
   },
@@ -35,11 +36,12 @@ const labels = {
     addTx: 'Ongeza Muamala', searchPlaceholder: 'Tafuta kwa jina, simu, au kitambulisho...',
     noTx: 'Hakuna miamala.', addFirst: 'Ongeza muamala wa kwanza',
     memberName: 'Jina la Mwanachama', phone: 'Simu', amount: 'Kiasi (TSh)',
-    txId: 'Kitambulisho cha Muamala', date: 'Tarehe', source: 'Chanzo',
+    txId: 'Kitambulisho cha Muamala', date: 'Tarehe', source: 'Chanzo', category: 'Aina',
     fullName: 'Jina kamili', notes: 'Maelezo (si lazima)', monthlyContrib: 'Mchango wa kila mwezi...',
     cancel: 'Ghairi', save: 'Hifadhi', deleteTx: 'Futa Muamala?',
     deleteDesc: 'Hatua hii haiwezi kutendwa tena.', delete: 'Futa',
     smsImport: 'Ingizo la SMS', manual: 'Mkono',
+    weekly: 'Ya Wiki', udiakonia: 'Udiakonia', other: 'Nyingine',
     txAdded: 'Muamala umeongezwa', txDeleted: 'Muamala umefutwa',
     validationError: 'Hitilafu ya uthibitishaji', requiredMissing: 'Sehemu zinazohitajika hazipo.',
   },
@@ -54,11 +56,12 @@ interface Transaction {
   transaction_date: string;
   notes: string | null;
   source: string;
+  category: string;
 }
 
 const emptyForm = {
   member_name: '', phone_number: '', amount: '', transaction_id: '',
-  transaction_date: new Date().toISOString().split('T')[0], notes: '',
+  transaction_date: new Date().toISOString().split('T')[0], notes: '', category: 'weekly',
 };
 
 export default function TransactionsPage() {
@@ -109,6 +112,7 @@ export default function TransactionsPage() {
       member_name: form.member_name, phone_number: form.phone_number,
       amount: Number(form.amount), transaction_id: form.transaction_id,
       transaction_date: form.transaction_date, notes: form.notes || null,
+      category: form.category,
     });
     if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
     else { toast({ title: t.txAdded }); setDialogOpen(false); fetchTransactions(); }
@@ -175,7 +179,7 @@ export default function TransactionsPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
-                  {[t.memberName, t.phone, t.amount, t.txId, t.date, t.source, ''].map((h) => (
+                  {[t.memberName, t.phone, t.amount, t.txId, t.date, t.category, t.source, ''].map((h) => (
                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{h}</th>
                   ))}
                 </tr>
@@ -188,6 +192,11 @@ export default function TransactionsPage() {
                     <td className="px-5 py-3.5 text-secondary font-semibold">{Number(tx.amount).toLocaleString()}</td>
                     <td className="px-5 py-3.5 text-muted-foreground text-sm font-mono">{tx.transaction_id}</td>
                     <td className="px-5 py-3.5 text-muted-foreground text-sm">{tx.transaction_date}</td>
+                    <td className="px-5 py-3.5">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${tx.category === 'udiakonia' ? 'bg-secondary/15 text-secondary' : tx.category === 'other' ? 'bg-muted text-muted-foreground' : 'bg-primary/15 text-primary'}`}>
+                        {tx.category === 'udiakonia' ? t.udiakonia : tx.category === 'other' ? t.other : t.weekly}
+                      </span>
+                    </td>
                     <td className="px-5 py-3.5">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${tx.source === 'sms_import' ? 'bg-accent/15 text-accent-foreground' : 'bg-muted text-muted-foreground'}`}>
                         {tx.source === 'sms_import' ? t.smsImport : t.manual}
@@ -230,9 +239,23 @@ export default function TransactionsPage() {
                 <Input value={form.transaction_id} onChange={(e) => setForm({ ...form, transaction_id: e.target.value })} placeholder="QAZ1234567" />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>{t.date}</Label>
-              <Input type="date" value={form.transaction_date} onChange={(e) => setForm({ ...form, transaction_date: e.target.value })} />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>{t.date}</Label>
+                <Input type="date" value={form.transaction_date} onChange={(e) => setForm({ ...form, transaction_date: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>{t.category}</Label>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="weekly">{t.weekly}</option>
+                  <option value="udiakonia">{t.udiakonia}</option>
+                  <option value="other">{t.other}</option>
+                </select>
+              </div>
             </div>
             <div className="space-y-2">
               <Label>{t.notes}</Label>

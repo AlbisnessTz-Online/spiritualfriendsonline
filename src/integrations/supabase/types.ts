@@ -206,6 +206,7 @@ export type Database = {
       transactions: {
         Row: {
           amount: number
+          category: string
           created_at: string
           created_by: string | null
           id: string
@@ -220,6 +221,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          category?: string
           created_at?: string
           created_by?: string | null
           id?: string
@@ -234,6 +236,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          category?: string
           created_at?: string
           created_by?: string | null
           id?: string
@@ -301,6 +304,7 @@ export type Database = {
         | "treasurer"
         | "secretary"
         | "discipline_leader"
+        | "financial_group"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -434,6 +438,7 @@ export const Constants = {
         "treasurer",
         "secretary",
         "discipline_leader",
+        "financial_group",
       ],
     },
   },
