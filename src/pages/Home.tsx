@@ -467,6 +467,7 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <Link to="/about" className="hover:text-primary transition-colors">About Us</Link>
+              <Link to="/udiakonia" className="hover:text-primary transition-colors">Udiakonia</Link>
               <Link to="/about" className="hover:text-primary transition-colors">Contact</Link>
               <Link
                 to="/admin"
