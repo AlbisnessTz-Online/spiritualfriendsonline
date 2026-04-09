@@ -126,6 +126,7 @@ export default function LeadersPage() {
     else {
       toast({ title: t.leaderRegistered, description: `${form.full_name} → ${ROLE_CONFIG[form.role].label}` });
       setDialogOpen(false);
+      setInviteLinkDialog(form.email.toLowerCase());
       setForm({ email: '', full_name: '', role: 'treasurer' });
       fetchInvitations();
     }
