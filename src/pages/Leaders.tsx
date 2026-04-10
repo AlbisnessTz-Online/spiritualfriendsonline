@@ -244,6 +244,9 @@ export default function LeadersPage() {
                   <button onClick={() => handleCopyLink(inv.email)} title={t.copyInviteLink} className="p-1.5 hover:bg-primary/10 rounded-lg text-muted-foreground hover:text-primary transition-colors flex-shrink-0">
                     <Copy className="w-3.5 h-3.5" />
                   </button>
+                  <button onClick={() => handleWhatsAppShare(inv.email, inv.full_name)} title="WhatsApp" className="p-1.5 hover:bg-green-500/10 rounded-lg text-muted-foreground hover:text-green-600 transition-colors flex-shrink-0">
+                    <MessageCircle className="w-3.5 h-3.5" />
+                  </button>
                   <button onClick={() => setDeleteId(inv.id)} className="p-1.5 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-colors flex-shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
