@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Loader2, Crown, Shield, User, BookOpen, CheckCircle2, Clock, Copy, Check } from 'lucide-react';
+import { Plus, Trash2, Loader2, Crown, Shield, User, BookOpen, CheckCircle2, Clock, Copy, Check, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -94,6 +94,14 @@ export default function LeadersPage() {
     setLinkCopied(true);
     toast({ title: t.linkCopied });
     setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const handleWhatsAppShare = (email: string, fullName: string) => {
+    const link = getInviteLink(email);
+    const text = lang === 'sw'
+      ? `Habari ${fullName}! Umealikwa kujiunga na Spiritual Friends kama kiongozi. Bonyeza kiungo hiki kujisajili:\n${link}`
+      : `Hello ${fullName}! You've been invited to join Spiritual Friends as a leader. Click this link to register:\n${link}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const ROLE_CONFIG: Record<AppRole, { label: string; icon: React.ElementType; color: string; description: string }> = {
@@ -236,6 +244,9 @@ export default function LeadersPage() {
                   <button onClick={() => handleCopyLink(inv.email)} title={t.copyInviteLink} className="p-1.5 hover:bg-primary/10 rounded-lg text-muted-foreground hover:text-primary transition-colors flex-shrink-0">
                     <Copy className="w-3.5 h-3.5" />
                   </button>
+                  <button onClick={() => handleWhatsAppShare(inv.email, inv.full_name)} title="WhatsApp" className="p-1.5 hover:bg-green-500/10 rounded-lg text-muted-foreground hover:text-green-600 transition-colors flex-shrink-0">
+                    <MessageCircle className="w-3.5 h-3.5" />
+                  </button>
                   <button onClick={() => setDeleteId(inv.id)} className="p-1.5 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-colors flex-shrink-0">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -320,6 +331,12 @@ export default function LeadersPage() {
                 {linkCopied ? t.linkCopied : t.copyLink}
               </Button>
             </div>
+            <Button size="sm" className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+              const inv = invitations.find(i => i.email === inviteLinkDialog);
+              if (inviteLinkDialog) handleWhatsAppShare(inviteLinkDialog, inv?.full_name || '');
+            }}>
+              <MessageCircle className="w-4 h-4" /> Share via WhatsApp
+            </Button>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setInviteLinkDialog(null); setLinkCopied(false); }}>{t.close}</Button>

@@ -37,7 +37,7 @@ const FEED_ITEMS = [
   desc: 'Tim Mackie and Jon Collins unpack the literary structure of Scripture to help you read the Bible as a unified story pointing to Jesus.',
   duration: '45 min listen',
   tag: 'BibleProject',
-  link: 'https://bibleproject.com/podcasts/the-bible-project-podcast/'
+  link: 'https://bibleproject.com/podcast/how-to-read-the-bible/'
 },
 {
   category: 'Devotional Story',
@@ -53,31 +53,31 @@ const FEED_ITEMS = [
   category: 'Worship',
   icon: Music,
   color: 'bg-amber-500',
-  title: 'Goodness of God — Bethel Music',
+  title: 'Goodness of God — Bethel Music (Live)',
   desc: 'An anthem of gratitude celebrating God\'s faithfulness across every season of life. Perfect for your morning devotion.',
   duration: '4 min',
   tag: 'Worship Song',
-  link: 'https://www.youtube.com/watch?v=XrmPMDMSjXs'
+  link: 'https://www.youtube.com/watch?v=edKTMEnMEgI'
 },
 {
   category: 'Youth Program',
   icon: Flame,
   color: 'bg-orange-500',
-  title: 'Youth Alive Tanzania: Living in Purpose',
-  desc: 'A powerful series for African Christian youth discovering their God-given calling, identity, and purpose in society.',
+  title: 'Finding Your Identity in Christ — Elevation Youth',
+  desc: 'A powerful message for Christian youth discovering their God-given calling, identity, and purpose in today\'s world.',
   duration: '30 min',
   tag: 'Youth Series',
-  link: 'https://www.youtube.com/@YouthAlive'
+  link: 'https://www.youtube.com/watch?v=UWKdgKINJKg'
 },
 {
   category: 'Video',
   icon: Youtube,
   color: 'bg-red-500',
-  title: 'Why Does God Allow Suffering? — C.S. Lewis & Tim Keller',
-  desc: 'One of Christianity\'s hardest questions answered with compassion and clarity by two of the most respected Christian thinkers.',
+  title: 'The Problem of Evil — BibleProject Explore',
+  desc: 'One of Christianity\'s hardest questions explored — why does God allow suffering, and how does the Bible address it?',
   duration: '18 min watch',
   tag: 'Apologetics',
-  link: 'https://www.youtube.com/watch?v=Yw3EsEAkXCo'
+  link: 'https://www.youtube.com/watch?v=AEIn3T6nDAo'
 }];
 
 
