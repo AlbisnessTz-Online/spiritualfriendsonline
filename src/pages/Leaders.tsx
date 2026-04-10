@@ -331,6 +331,12 @@ export default function LeadersPage() {
                 {linkCopied ? t.linkCopied : t.copyLink}
               </Button>
             </div>
+            <Button size="sm" className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+              const inv = invitations.find(i => i.email === inviteLinkDialog);
+              if (inviteLinkDialog) handleWhatsAppShare(inviteLinkDialog, inv?.full_name || '');
+            }}>
+              <MessageCircle className="w-4 h-4" /> Share via WhatsApp
+            </Button>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setInviteLinkDialog(null); setLinkCopied(false); }}>{t.close}</Button>
