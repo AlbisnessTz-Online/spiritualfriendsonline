@@ -57,7 +57,7 @@ const FEED_ITEMS = [
   desc: 'An anthem of gratitude celebrating God\'s faithfulness across every season of life. Perfect for your morning devotion.',
   duration: '4 min',
   tag: 'Worship Song',
-  link: 'https://www.youtube.com/watch?v=edKTMEnMEgI'
+  link: 'https://www.youtube.com/watch?v=IvSuGyJQ6oM'
 },
 {
   category: 'Youth Program',
@@ -67,7 +67,7 @@ const FEED_ITEMS = [
   desc: 'A powerful message for Christian youth discovering their God-given calling, identity, and purpose in today\'s world.',
   duration: '30 min',
   tag: 'Youth Series',
-  link: 'https://www.youtube.com/watch?v=UWKdgKINJKg'
+  link: 'https://www.youtube.com/watch?v=qCTXtyhPLCw'
 },
 {
   category: 'Video',
@@ -77,7 +77,7 @@ const FEED_ITEMS = [
   desc: 'One of Christianity\'s hardest questions explored — why does God allow suffering, and how does the Bible address it?',
   duration: '18 min watch',
   tag: 'Apologetics',
-  link: 'https://www.youtube.com/watch?v=AEIn3T6nDAo'
+  link: 'https://www.youtube.com/watch?v=3dEh25pduQ8'
 }];
 
 
