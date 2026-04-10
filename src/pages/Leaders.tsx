@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Loader2, Crown, Shield, User, BookOpen, CheckCircle2, Clock, Copy, Check } from 'lucide-react';
+import { Plus, Trash2, Loader2, Crown, Shield, User, BookOpen, CheckCircle2, Clock, Copy, Check, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
