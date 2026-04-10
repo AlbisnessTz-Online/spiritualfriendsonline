@@ -96,6 +96,14 @@ export default function LeadersPage() {
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
+  const handleWhatsAppShare = (email: string, fullName: string) => {
+    const link = getInviteLink(email);
+    const text = lang === 'sw'
+      ? `Habari ${fullName}! Umealikwa kujiunga na Spiritual Friends kama kiongozi. Bonyeza kiungo hiki kujisajili:\n${link}`
+      : `Hello ${fullName}! You've been invited to join Spiritual Friends as a leader. Click this link to register:\n${link}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   const ROLE_CONFIG: Record<AppRole, { label: string; icon: React.ElementType; color: string; description: string }> = {
     admin: { label: t.admin, icon: Shield, color: 'bg-primary text-primary-foreground', description: t.adminDesc },
     chairperson: { label: t.chairperson, icon: Crown, color: 'bg-accent text-accent-foreground', description: t.chairpersonDesc },
