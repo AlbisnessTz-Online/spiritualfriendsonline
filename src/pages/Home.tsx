@@ -37,7 +37,7 @@ const FEED_ITEMS = [
   desc: 'Tim Mackie and Jon Collins unpack the literary structure of Scripture to help you read the Bible as a unified story pointing to Jesus.',
   duration: '45 min listen',
   tag: 'BibleProject',
-  link: 'https://bibleproject.com/podcast/how-to-read-the-bible/'
+  link: 'https://bibleproject.com/podcasts/series/how-to-read-the-bible-series/'
 },
 {
   category: 'Devotional Story',
