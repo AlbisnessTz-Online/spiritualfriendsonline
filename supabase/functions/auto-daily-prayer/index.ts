@@ -89,6 +89,43 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Authenticate: require cron secret or valid admin JWT
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  const incomingCronSecret = req.headers.get("x-cron-secret");
+  const authHeader = req.headers.get("Authorization");
+
+  let authorized = false;
+
+  // Check cron secret
+  if (cronSecret && incomingCronSecret === cronSecret) {
+    authorized = true;
+  }
+
+  // Check admin JWT
+  if (!authorized && authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.replace("Bearer ", "");
+    const anonClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!);
+    const { data, error } = await anonClient.auth.getUser(token);
+    if (!error && data?.user) {
+      // Check if user has any role
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .limit(1);
+      if (roles && roles.length > 0) {
+        authorized = true;
+      }
+    }
+  }
+
+  if (!authorized) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   // Allow manual trigger or cron
   if (req.method !== "POST" && req.method !== "GET") {
     return new Response("Method not allowed", { status: 405 });
