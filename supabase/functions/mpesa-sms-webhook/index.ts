@@ -117,10 +117,12 @@ async function extractSmsText(req: Request): Promise<string> {
       source.message || source.sms || source.body || source.text ||
       source.content || source.msg || source.smsText || source.sms_body ||
       source.sms_message || source.fullSms || source.sms_text ||
+      source.key ||
       source.Message || source.SMS || source.Body ||
       body.message || body.sms || body.body || body.text ||
       body.content || body.msg || body.smsText || body.sms_body ||
       body.sms_message || body.fullSms || body.sms_text ||
+      body.key ||
       body.Message || body.SMS || body.Body ||
       '';
     if (smsText) return String(smsText);
