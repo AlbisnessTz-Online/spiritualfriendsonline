@@ -74,23 +74,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Validate the invitation
+  // If an invite email is provided, trust the link and allow signup.
+  // The server-side handle_leader_signup trigger validates the invitation during signup.
   useEffect(() => {
     if (!inviteEmail) return;
-    supabase
-      .from('leader_invitations')
-      .select('full_name, accepted')
-      .eq('email', inviteEmail.toLowerCase())
-      .limit(1)
-      .then(({ data }) => {
-        if (data && data.length > 0 && !data[0].accepted) {
-          setInviteValid(true);
-          setInviteName(data[0].full_name);
-          setFullName(data[0].full_name);
-        } else {
-          setInviteValid(false);
-        }
-      });
+    setInviteValid(true);
+    setInviteName('');
   }, [inviteEmail]);
 
   if (!authLoading && user) return <Navigate to="/dashboard" replace />;
