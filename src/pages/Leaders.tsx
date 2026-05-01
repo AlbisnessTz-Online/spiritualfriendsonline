@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Loader2, Crown, Shield, User, BookOpen, CheckCircle2, Clock, Copy, Check, MessageCircle } from 'lucide-react';
+import { Plus, Trash2, Loader2, Crown, Shield, User, BookOpen, CheckCircle2, Clock, Copy, Check, MessageCircle, HandHeart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +17,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 
-type AppRole = 'admin' | 'chairperson' | 'treasurer' | 'secretary' | 'discipline_leader';
+type AppRole = 'admin' | 'chairperson' | 'treasurer' | 'secretary' | 'discipline_leader' | 'prayer_coordinator';
 
 interface Invitation {
   id: string; email: string; role: AppRole; full_name: string;
@@ -44,6 +44,8 @@ const labels = {
     adminDesc: 'Full system access', chairpersonDesc: 'Group chair & leader',
     treasurerDesc: 'Manages finances & contributions', secretaryDesc: 'Manages records & members',
     disciplineLeaderDesc: 'Maintains group discipline',
+    prayerCoordinator: 'Prayer Coordinator',
+    prayerCoordinatorDesc: 'Coordinates daily prayers',
     inviteLink: 'Invite Link', inviteLinkDesc: 'Share this link with the leader to sign up:',
     copyLink: 'Copy Link', linkCopied: 'Link copied!', close: 'Close',
     copyInviteLink: 'Copy invite link',
@@ -67,6 +69,8 @@ const labels = {
     adminDesc: 'Ufikiaji kamili wa mfumo', chairpersonDesc: 'Mwenyekiti & kiongozi wa kikundi',
     treasurerDesc: 'Anasimamia fedha na michango', secretaryDesc: 'Anasimamia kumbukumbu na wanachama',
     disciplineLeaderDesc: 'Anadumisha nidhamu ya kikundi',
+    prayerCoordinator: 'Mratibu wa Maombi',
+    prayerCoordinatorDesc: 'Anaratibu maombi ya kila siku',
     inviteLink: 'Kiungo cha Mwaliko', inviteLinkDesc: 'Shiriki kiungo hiki na kiongozi ili ajisajili:',
     copyLink: 'Nakili Kiungo', linkCopied: 'Kiungo kimenakiliwa!', close: 'Funga',
     copyInviteLink: 'Nakili kiungo cha mwaliko',
@@ -110,6 +114,7 @@ export default function LeadersPage() {
     treasurer: { label: t.treasurer, icon: User, color: 'bg-secondary text-secondary-foreground', description: t.treasurerDesc },
     secretary: { label: t.secretary, icon: BookOpen, color: 'bg-blue-500 text-white', description: t.secretaryDesc },
     discipline_leader: { label: t.disciplineLeader, icon: Shield, color: 'bg-purple-500 text-white', description: t.disciplineLeaderDesc },
+    prayer_coordinator: { label: t.prayerCoordinator, icon: HandHeart, color: 'bg-rose-500 text-white', description: t.prayerCoordinatorDesc },
   };
 
   const fetchInvitations = async () => {
@@ -165,7 +170,7 @@ export default function LeadersPage() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {(['chairperson', 'treasurer', 'secretary', 'discipline_leader'] as AppRole[]).map((role) => {
+        {(['chairperson', 'treasurer', 'secretary', 'discipline_leader', 'prayer_coordinator'] as AppRole[]).map((role) => {
           const cfg = ROLE_CONFIG[role];
           const Icon = cfg.icon;
           const registered = invitations.find((i) => i.role === role);
@@ -289,6 +294,7 @@ export default function LeadersPage() {
                   <SelectItem value="treasurer">💰 {t.treasurer}</SelectItem>
                   <SelectItem value="secretary">📋 {t.secretary}</SelectItem>
                   <SelectItem value="discipline_leader">🛡️ {t.disciplineLeader}</SelectItem>
+                  <SelectItem value="prayer_coordinator">🙏 {t.prayerCoordinator}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
