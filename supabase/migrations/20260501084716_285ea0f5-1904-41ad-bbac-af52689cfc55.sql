@@ -1,0 +1,2 @@
+UPDATE public.leader_invitations SET full_name = 'Albert Mamuya' WHERE email = 'albertluwavi@gmail.com';
+UPDATE public.leader_invitations SET full_name = 'Jacqueline Mangowi' WHERE email = 'jaquckmangowi74@gmail.com';
