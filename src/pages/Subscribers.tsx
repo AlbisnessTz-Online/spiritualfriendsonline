@@ -79,7 +79,10 @@ export default function SubscribersPage() {
   const togglePref = async (s: Subscriber, field: 'subscribed_daily_prayer' | 'subscribed_announcements', value: boolean) => {
     const prev = subs;
     setSubs(curr => curr.map(x => x.id === s.id ? { ...x, [field]: value } : x));
-    const { error } = await supabase.from('member_subscribers').update({ [field]: value }).eq('id', s.id);
+    const update = field === 'subscribed_daily_prayer'
+      ? { subscribed_daily_prayer: value }
+      : { subscribed_announcements: value };
+    const { error } = await supabase.from('member_subscribers').update(update).eq('id', s.id);
     if (error) {
       setSubs(prev);
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
