@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAppTheme } from '@/contexts/ThemeContext';
 import {
   LayoutDashboard, Users, CreditCard, FileText, BookOpen,
-  Upload, LogOut, Menu, X, Cross, Crown, Smartphone, Star, Settings, Mail
+  Upload, LogOut, Menu, X, Cross, Crown, Smartphone, Star, Settings, Mail, Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +13,7 @@ const navLabels = {
     dashboard: 'Dashboard', members: 'Members', transactions: 'Transactions',
     leaders: 'Leaders', smsImport: 'SMS Import', autoSms: 'Auto SMS',
     reports: 'Reports', dailyPrayer: 'Daily Prayer', about: 'About',
-    settings: 'Settings', subscribers: 'Subscribers',
+    settings: 'Settings', subscribers: 'Subscribers', assistant: 'AI Assistant',
     signedIn: 'Signed in as', signOut: 'Sign Out',
     system: 'Management System',
   },
@@ -21,7 +21,7 @@ const navLabels = {
     dashboard: 'Dashibodi', members: 'Wanachama', transactions: 'Miamala',
     leaders: 'Viongozi', smsImport: 'Ingiza SMS', autoSms: 'SMS Otomatiki',
     reports: 'Ripoti', dailyPrayer: 'Sala ya Kila Siku', about: 'Kuhusu',
-    settings: 'Mipangilio', subscribers: 'Wajiandikishaji',
+    settings: 'Mipangilio', subscribers: 'Wajiandikishaji', assistant: 'Msaidizi wa AI',
     signedIn: 'Umeingia kama', signOut: 'Ondoka',
     system: 'Mfumo wa Usimamizi',
   },
@@ -44,6 +44,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
     { label: t.autoSms, href: '/sms-webhook', icon: Smartphone },
     { label: t.reports, href: '/reports', icon: FileText },
     { label: t.dailyPrayer, href: '/prayers', icon: BookOpen },
+    { label: t.assistant, href: '/assistant', icon: Sparkles },
     { label: t.subscribers, href: '/subscribers', icon: Mail },
     { label: t.about, href: '/about', icon: Star },
     { label: t.settings, href: '/settings', icon: Settings },
