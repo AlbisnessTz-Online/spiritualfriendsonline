@@ -16,7 +16,9 @@ serve(async (req) => {
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    const today = new Date().toISOString().split('T')[0];
+    // Use Tanzania timezone (UTC+3) so the date matches the locally-scheduled prayer
+    const tzNow = new Date(Date.now() + 3 * 60 * 60 * 1000);
+    const today = tzNow.toISOString().split('T')[0];
 
     // Get today's active prayer
     const { data: prayer, error: prayerError } = await supabase
