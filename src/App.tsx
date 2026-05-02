@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound";
 import AboutPage from "./pages/About";
 import UdiakoniaPublicPage from "./pages/UdiakoniaPublic";
 import SubscribersPage from "./pages/Subscribers";
+import AssistantPage from "./pages/Assistant";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/reports" element={<ProtectedRoute><AppLayout><ReportsPage /></AppLayout></ProtectedRoute>} />
               <Route path="/prayers" element={<ProtectedRoute><AppLayout><PrayersPage /></AppLayout></ProtectedRoute>} />
               <Route path="/subscribers" element={<ProtectedRoute><AppLayout><SubscribersPage /></AppLayout></ProtectedRoute>} />
+              <Route path="/assistant" element={<ProtectedRoute><AppLayout><AssistantPage /></AppLayout></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><AppLayout><SettingsPage /></AppLayout></ProtectedRoute>} />
               <Route path="/udiakonia" element={<ProtectedRoute><AppLayout><UdiakoniaPublicPage /></AppLayout></ProtectedRoute>} />
               <Route path="/about" element={<AboutPage />} />
