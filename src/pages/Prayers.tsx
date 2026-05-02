@@ -80,21 +80,17 @@ export default function PrayersPage() {
   const generateTodaysPrayer = async () => {
     setGenerating(true);
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      const res = await fetch(`${supabaseUrl}/functions/v1/auto-daily-prayer`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${anonKey}` },
-        body: JSON.stringify({ source: 'manual' }),
+      const { data, error } = await supabase.functions.invoke('auto-daily-prayer', {
+        body: { source: 'manual' },
       });
-      const data = await res.json();
-      if (data.success) {
+      if (error) throw error;
+      if (data?.success) {
         toast({ title: t.prayerGenerated, description: data.title });
         fetchPrayers();
-      } else if (data.message?.includes('already exists')) {
+      } else if (data?.message?.includes('already exists')) {
         toast({ title: t.alreadySet, description: t.editBelow });
       } else {
-        toast({ title: t.genFailed, description: data.error || t.tryAgain, variant: 'destructive' });
+        toast({ title: t.genFailed, description: data?.error || t.tryAgain, variant: 'destructive' });
       }
     } catch (e) {
       toast({ title: 'Error', description: String(e), variant: 'destructive' });
