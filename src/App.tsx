@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,6 +36,8 @@ const App = () => (
           <AuthProvider>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              {/* Redirect from old base path to root */}
+              <Route path="/spiritualfriendsonline/*" element={<Navigate to="/" replace />} />
               {/* Admin login is at /admin — secret URL, not visible on homepage */}
               <Route path="/admin" element={<LoginPage />} />
               <Route path="/login" element={<LoginPage />} />
