@@ -1,38 +1,34 @@
-# Welcome to your Lovable project
+# Spiritual Friends Online
+
+A community platform for spiritual connections and meaningful interactions built with React, TypeScript, and Tailwind CSS.
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**Repository**: https://github.com/AlbisnessTz-Online/spiritualfriendsonline
 
 ## How can I edit this code?
 
 There are several ways of editing your application.
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+If you want to work locally using your own IDE, you can clone this repo and push changes.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
 Follow these steps:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Step 1: Clone the repository
+git clone https://github.com/AlbisnessTz-Online/spiritualfriendsonline.git
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Step 2: Navigate to the project directory
+cd spiritualfriendsonline
 
-# Step 3: Install the necessary dependencies.
+# Step 3: Install dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Start the development server
 npm run dev
 ```
 
@@ -59,15 +55,39 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase (Backend)
+- React Router (Navigation)
+- React Query (State Management)
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+This project is automatically deployed to GitHub Pages on every push to the main branch.
 
-## Can I connect a custom domain to my Lovable project?
+**Live site**: https://AlbisnessTz-Online.github.io/spiritualfriendsonline/
 
-Yes, you can!
+The deployment is handled by GitHub Actions workflow (`.github/workflows/deploy.yml`)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Can I connect a custom domain to my Spiritual Friends Online?
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Yes! You can connect a custom domain like `spiritualfriends.online` through GitHub Pages settings.
+
+To connect a domain:
+1. Go to your repository Settings
+2. Navigate to Pages
+3. Under "Custom domain", enter your domain name
+4. Click Save
+5. Update your domain registrar's DNS settings to point to GitHub Pages
+
+Read more: [GitHub Pages Custom Domain Documentation](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)
+
+## Getting Started
+
+1. Clone this repository
+2. Install dependencies: `npm i`
+3. Start development server: `npm run dev`
+4. Build for production: `npm run build`
+5. Preview production build: `npm run preview`
+
+## License
+
+This project is open source and available under the MIT License.
